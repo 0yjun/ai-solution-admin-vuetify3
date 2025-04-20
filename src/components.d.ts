@@ -15,6 +15,7 @@ declare module 'vue' {
     copy: typeof import('./components/AppFooter copy.vue')['default']
     DashBoard: typeof import('./components/DashBoard.vue')['default']
     HelloWorld: typeof import('./components/HelloWorld.vue')['default']
+    Login: typeof import('./components/Login.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }
