@@ -62,7 +62,6 @@ const usernameRules = [
 const password = ref("");
 
 const onLogin = () => {
-  console.log("로그인 시도:", username.value, password.value);
-  // 로그인 로직 처리
+  const response = await 
 };
 </script>
