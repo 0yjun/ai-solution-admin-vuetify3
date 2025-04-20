@@ -1,5 +1,5 @@
 <template>
-  <HelloWorld />
+  <DashBoard />
 </template>
 
 <script lang="ts" setup>
