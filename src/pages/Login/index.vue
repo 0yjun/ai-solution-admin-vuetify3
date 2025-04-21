@@ -43,17 +43,42 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref } from 'vue';
 
+  import { ref } from 'vue';
   const username = ref('');
+  const password = ref('');
+
   const usernameRules = [
     (value: string[]) => {
       if (value.length >= 3) return true;
       return 'username must be at leat 3 characters';
     },
   ];
-  const password = ref('');
 
-  const onLogin = () => {
-  };
+  const onLogin = async () => {
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: username.value,
+          password: password.value,
+        }),
+      })
+
+      const result = await response.json()
+      if (response.ok) {
+        alert(result?.message || '로그인 성공')
+      // 토큰 저장 예: localStorage.setItem('token', result.token)
+      } else {
+        alert(result.message|| '로그인 실패')
+        console.error('로그인 실패:', result.message)
+      }
+    } catch (err) {
+      console.error('요청 오류:', err)
+    }
+  }
+
 </script>
