@@ -12,10 +12,8 @@ declare module 'vue' {
     AppDrawer: typeof import('./components/AppDrawer.vue')['default']
     AppFooter: typeof import('./components/AppFooter.vue')['default']
     AppMain: typeof import('./components/AppMain.vue')['default']
-    copy: typeof import('./components/AppFooter copy.vue')['default']
     DashBoard: typeof import('./components/DashBoard.vue')['default']
     HelloWorld: typeof import('./components/HelloWorld.vue')['default']
-    Login: typeof import('./components/Login.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }
