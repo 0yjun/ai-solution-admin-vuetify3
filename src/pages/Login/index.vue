@@ -1,13 +1,13 @@
 <template>
   <v-container class="fill-height d-flex align-center justify-center" fluid>
-    <v-row align="center" class="ma-0 pa-0" justify="center" style="width: 800px; max-width: 90%">
+    <v-row align="center" class="ma-0 pa-0" justify="center" style="width: 800px; max-width: 60%">
       <v-col class="pa-0" cols="12" md="6">
         <v-img
           alt="로그인 이미지"
           class="rounded-l-lg"
           cover
           height="100%"
-          src="https://via.placeholder.com/400x400"
+          src="/src/assets/logo.png"
         />
       </v-col>
 
@@ -34,7 +34,9 @@
               required
               type="password"
             />
-            <v-btn block class="mt-4" color="primary" type="submit">로그인</v-btn>
+            <v-btn block class="mt-4" :disabled="authStore.isLoading" type="submit">
+              {{ authStore.isLoading ? '로그인 중...' : '로그인' }}
+            </v-btn>
           </v-form>
         </v-card>
       </v-col>
@@ -45,8 +47,13 @@
 <script lang="ts" setup>
 
   import { ref } from 'vue';
+  import { useAuthStore } from '@/stores/auth';
+  import { useRouter } from 'vue-router';
+
   const username = ref('');
   const password = ref('');
+  const authStore = useAuthStore();
+  const router = useRouter();
 
   const usernameRules = [
     (value: string[]) => {
@@ -56,28 +63,12 @@
   ];
 
   const onLogin = async () => {
-    try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: username.value,
-          password: password.value,
-        }),
-      })
-
-      const result = await response.json()
-      if (response.ok) {
-        alert(result?.message || '로그인 성공')
-      // 토큰 저장 예: localStorage.setItem('token', result.token)
-      } else {
-        alert(result.message|| '로그인 실패')
-        console.error('로그인 실패:', result.message)
-      }
-    } catch (err) {
-      console.error('요청 오류:', err)
+    const success = await authStore.login({
+      username: username.value ,
+      password: password.value,
+    })
+    if(success){
+      router.push('/')
     }
   }
 

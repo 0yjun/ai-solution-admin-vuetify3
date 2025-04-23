@@ -1,10 +1,10 @@
 // Utilities
-import { defineStore } from "pinia";
+import { defineStore } from 'pinia';
 
-export const useAppStore = defineStore("app", () => {
+export const useAppStore = defineStore('app', () => {
   const drawer = ref(false);
 
-  function toggleDrawer() {
+  function toggleDrawer () {
     drawer.value = !drawer.value;
   }
   return { drawer, toggleDrawer };
