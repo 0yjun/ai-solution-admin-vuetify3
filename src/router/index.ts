@@ -35,8 +35,8 @@ const router = createRouter({
 // 네비게이션 가드 적용
 router.beforeEach(async to=>{
   const authStore = useAuthStore()
-  const isAuthenticated = authStore.isAuthenticated;
   await authStore.fetchMe()
+  const isAuthenticated = authStore.isAuthenticated;
   console.log('isAuthenticated',isAuthenticated)
   if(!isAuthenticated && to.name !=='/Login/'){
     return { name:'/Login/' }
