@@ -13,6 +13,7 @@ import router from '../router'
 import type { App } from 'vue'
 
 export function registerPlugins (app: App) {
+  console.log('registerPlugins 실행')
   app
     .use(vuetify)
     .use(router)

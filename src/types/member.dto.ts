@@ -1,4 +1,4 @@
-export interface User {
+export interface MemberDto {
   username: string
   role: string
 }

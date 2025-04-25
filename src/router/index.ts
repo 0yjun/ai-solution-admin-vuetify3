@@ -9,6 +9,7 @@ import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router/
 import { setupLayouts } from 'virtual:generated-layouts'
 import { routes as autoRoutes } from 'vue-router/auto-routes'
 import { useAuthStore } from '@/stores/auth'
+import { useMenuStore } from '@/stores'
 
 
 // vue-router 플러그인을 사용한 디렉토리 기반 라우팅 설정
@@ -32,14 +33,34 @@ const router = createRouter({
   routes: setupLayouts(routes),
 })
 
+let initialized = false;
 // 네비게이션 가드 적용
-router.beforeEach(async to=>{
+router.beforeEach(async (to,from)=>{
   const authStore = useAuthStore()
-  await authStore.fetchMe()
-  const isAuthenticated = authStore.isAuthenticated;
-  console.log('isAuthenticated',isAuthenticated)
-  if(!isAuthenticated && to.name !=='/Login/'){
+  const menuStore = useMenuStore()
+  if(!initialized){
+    initialized = true
+    await authStore.fetchMe()
+  }
+
+  console.log(`authStore.isAuthenticated ${authStore.isAuthenticated}`)
+  // 1) 인증 체크
+  if(!authStore.isAuthenticated && to.name !=='/Login/'){
     return { name:'/Login/' }
+  }
+
+  // 2) 로그인 후에도 메뉴가 로드되지 않았다면 재시도
+  if (
+    authStore.isAuthenticated &&
+    !menuStore.isLoaded &&
+    !menuStore.isLoading
+  ) {
+    const ok = await menuStore.fetchMenu()
+    console.log(ok)
+    if (!ok) {
+      // 메뉴 로드 실패 시 다시 로그인 페이지로 (or 에러 페이지)
+      return { name: '/Login/', query: { error: 'menu_load_failed' } }
+    }
   }
 })
 

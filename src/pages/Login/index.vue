@@ -69,6 +69,8 @@
     })
     if(success){
       router.push('/')
+    }else{
+      alert(authStore.errorMessage || '로그인에 실패하였습니다.')
     }
   }
 

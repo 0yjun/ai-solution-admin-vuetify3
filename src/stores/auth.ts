@@ -1,12 +1,12 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
-import type { ApiResponse, ApiResponseError, LoginRequest, User } from '@/types'
+import type { ApiResponse, ApiResponseError, ApiResponseSuccess, LoginRequestDto, MemberDto } from '@/types'
 
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     isAuthenticated: false as boolean,
-    user: null as User | null,
+    user: null as MemberDto | null,
     errorMessage: '' as string,
     isLoading: false as boolean, // ← 로그인 중 로딩 상태
   }),
@@ -15,15 +15,15 @@ export const useAuthStore = defineStore('auth', {
      * 로그인 시도
      * @returns 성공하면 true, 실패하면 false
      */
-    async login (credentials: LoginRequest): Promise<boolean> {
+    async login (credentials: LoginRequestDto): Promise<boolean> {
       this.isLoading = true
       this.errorMessage = ''
 
       try {
-        // 1) API 호출
-        const { data: resp } = await axios.post<ApiResponse<User>>('/api/auth/login',credentials,{ withCredentials: true })
+        const { data: resp } = await axios.post<
+          ApiResponseSuccess<MemberDto> | ApiResponseError
+        >('/api/auth/login', credentials, { withCredentials: true })
 
-        // 2) 비즈니스 실패 처리
         if (resp.code !== 'SUCCESS') {
           this.errorMessage = resp.message
           this.isAuthenticated = false
@@ -31,13 +31,11 @@ export const useAuthStore = defineStore('auth', {
           return false
         }
 
-        // 3) 성공 처리
         this.user = resp.data
         this.isAuthenticated = true
         return true
 
       } catch (err: unknown) {
-        // 4) 네트워크 에러 등 처리
         let msg = '로그인에 실패하였습니다.'
         if (axios.isAxiosError<ApiResponseError>(err) && err.response) {
           msg = err.response.data.message
@@ -50,7 +48,6 @@ export const useAuthStore = defineStore('auth', {
         return false
 
       } finally {
-        // 5) 로딩 상태 해제
         this.isLoading = false
       }
     },
@@ -61,7 +58,7 @@ export const useAuthStore = defineStore('auth', {
 
       try {
         // 1) JWT 쿠키가 있으면 자동 포함됨
-        const res = await axios.get<ApiResponse<User>>(
+        const res = await axios.get<ApiResponse<MemberDto>>(
           '/api/members/me',
           { withCredentials: true }
         )
