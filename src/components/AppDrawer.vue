@@ -1,17 +1,74 @@
 <template>
-  <v-navigation-drawer v-model="drawer">
+  <v-navigation-drawer
+    v-model="drawerOpen"
+    expand-on-hover
+    :mini-variant-width="80"
+    permanent
+    :rail="drawerMini"
+    :width="256"
+  >
     <v-list>
-      <v-list-item title="Navigation drawer"></v-list-item>
+      <v-list-item
+        class="mt-2 drawer-logo"
+        prepend-icon="AI"
+        title="AI SOLUTION"
+      />
     </v-list>
+    <v-divider />
+    <v-list dense>
+      <template v-for="menuMain in menus" :key="menuMain.name">
+        <!-- 자식이 없는 루트메뉴 -->
+        <v-list-item
+          v-if="!hasChildren(menuMain)"
+          :prepend-icon="menuMain.icon"
+          :title="menuMain.name"
+          :to="menuMain.url"
+          :value="menuMain"
+        />
+
+        <!-- 자식이 있는 루트메뉴 -->
+        <v-list-group v-else :value="menuMain">
+          <template #activator="{ props }">
+            <v-list-item
+              v-bind="props"
+              :prepend-icon="menuMain.icon"
+              :title="menuMain.name"
+            />
+          </template>
+
+          <v-list-item
+            v-for="(children, i) in menuMain.children"
+            :key="i"
+            :prepend-icon="children.icon"
+            :title="children.name"
+            :to="children.url"
+            :value="children"
+          />
+        </v-list-group>
+
+
+      </template>
+    </v-list>
+
   </v-navigation-drawer>
 </template>
 
 <script setup lang="ts">
-import { useAppStore } from "@/stores/app";
-import { storeToRefs } from "pinia";
+  import { storeToRefs } from 'pinia';
+  import { useDrawerStore } from '@/stores/drawer';
+  import { useMenuStore } from '@/stores';
+  import type { MenuClientDto } from '@/types/menu.dto';
 
-const appStore = useAppStore();
-const { drawer } = storeToRefs(appStore);
+  const drawerStore = useDrawerStore();
+  const { drawerOpen, drawerMini } = storeToRefs(drawerStore);
+
+  const menuStore = useMenuStore();
+  const { menus } = storeToRefs(menuStore)
+  console.log(menus)
+
+  /** 자식 메뉴 존재 여부 검사 */
+  const hasChildren = (menu: MenuClientDto): boolean =>
+    Array.isArray(menu.children) && menu.children.length > 0
 </script>
 
 <style scoped lang="sass"></style>

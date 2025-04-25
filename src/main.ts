@@ -26,10 +26,13 @@ registerPlugins(app);
 // 새로고침시 JWT로 세션 유지
 import { useAuthStore } from './stores';
 const authStore = useAuthStore()
-try {
-  await authStore.fetchMe()
-  console.log(`fetchMe 완료, isAuthenticated=${authStore.isAuthenticated}`)
-} catch (e) {
-  console.error('세션 확인 실패', e)
+if(!authStore.isAuthenticated){
+  try {
+    await authStore.fetchMe()
+    console.log(`fetchMe 완료, isAuthenticated=${authStore.isAuthenticated}`)
+  } catch (e) {
+    console.error('세션 확인 실패', e)
+  }
 }
+
 app.mount('#app');

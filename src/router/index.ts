@@ -43,24 +43,14 @@ router.beforeEach(async (to,from)=>{
     await authStore.fetchMe()
   }
 
-  console.log(`authStore.isAuthenticated ${authStore.isAuthenticated}`)
   // 1) 인증 체크
   if(!authStore.isAuthenticated && to.name !=='/Login/'){
     return { name:'/Login/' }
   }
 
   // 2) 로그인 후에도 메뉴가 로드되지 않았다면 재시도
-  if (
-    authStore.isAuthenticated &&
-    !menuStore.isLoaded &&
-    !menuStore.isLoading
-  ) {
-    const ok = await menuStore.fetchMenu()
-    console.log(ok)
-    if (!ok) {
-      // 메뉴 로드 실패 시 다시 로그인 페이지로 (or 에러 페이지)
-      return { name: '/Login/', query: { error: 'menu_load_failed' } }
-    }
+  if (authStore.isAuthenticated && !menuStore.isLoaded && !menuStore.isLoading) {
+    await menuStore.fetchMenu()
   }
 })
 

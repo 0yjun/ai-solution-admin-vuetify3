@@ -95,7 +95,6 @@ export const useAuthStore = defineStore('auth', {
       } finally {
         // 5) 항상 로딩 해제
         this.isLoading = false
-        console.log(this.isAuthenticated)
       }
     },
   },

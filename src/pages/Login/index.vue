@@ -47,13 +47,15 @@
 <script lang="ts" setup>
 
   import { ref } from 'vue';
-  import { useAuthStore } from '@/stores/auth';
+  import { useAuthStore,useMenuStore } from '@/stores';
   import { useRouter } from 'vue-router';
 
   const username = ref('');
   const password = ref('');
   const authStore = useAuthStore();
   const router = useRouter();
+  const menuStore = useMenuStore();
+
 
   const usernameRules = [
     (value: string[]) => {
@@ -68,6 +70,7 @@
       password: password.value,
     })
     if(success){
+      await menuStore.fetchMenu()
       router.push('/')
     }else{
       alert(authStore.errorMessage || '로그인에 실패하였습니다.')

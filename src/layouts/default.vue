@@ -1,6 +1,6 @@
 <template>
-  <AppBar />
   <AppDrawer />
+  <AppBar />
   <AppMain />
 
   <AppFooter />
