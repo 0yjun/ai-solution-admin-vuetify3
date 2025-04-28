@@ -19,11 +19,52 @@
     </template>
 
     <template #append>
-      {{ username }}
       <v-btn icon="mdi-theme-light-dark" title="toggle theme" @click="toggleTheme" />
-      <v-avatar color="surface-variant">
-        <span class="text-h5">{{ authStore.username }}</span>
-      </v-avatar>
+      <v-menu min-width="200px">
+        <template #activator="{ props }">
+          <v-btn
+            icon
+            v-bind="props"
+          >
+            <v-avatar
+              color="brown"
+              size="large"
+            >
+              <span class="text-h5">{{ authStore.user?.username }}</span>
+            </v-avatar>
+          </v-btn>
+        </template>
+        <v-card>
+          <v-card-text>
+            <div class="mx-auto text-center">
+              <v-avatar
+                color="brown"
+              >
+                <span class="text-h6">{{ authStore.user?.username }}</span>
+              </v-avatar>
+              <h3>{{ authStore.user?.username }}</h3>
+              <p class="text-caption mt-1">
+                {{ authStore.user?.role }}
+              </p>
+              <v-divider class="my-3" />
+              <v-btn
+                rounded
+                variant="text"
+              >
+                Edit Account
+              </v-btn>
+              <v-divider class="my-3" />
+              <v-btn
+                rounded
+                variant="text"
+                @click="onLogout"
+              >
+                Logout
+              </v-btn>
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-menu>
     </template>
   </v-app-bar>
 </template>
@@ -33,11 +74,13 @@
   import { useAuthStore } from '@/stores'
   import { storeToRefs } from 'pinia'
   import { useTheme } from 'vuetify'
+  import { useRouter } from 'vue-router'
+
   const drawerStore = useDrawerStore()
   const { drawerOpen, drawerMini } = storeToRefs(drawerStore)
   const theme = useTheme()
   const authStore = useAuthStore();
-  const { username } = storeToRefs(authStore)
+  const router = useRouter();
 
   //데스크탑: 미니 토글
   function onDrawerMiniClick () {
@@ -54,6 +97,14 @@
   //테마 변경
   function toggleTheme () {
     theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark'
+  }
+
+  //로그아웃
+  async function onLogout (){
+    const ok = await authStore.logout();
+    if (ok) {
+      router.push('/login')
+    }
   }
 
 </script>

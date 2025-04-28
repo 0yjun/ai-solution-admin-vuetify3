@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
 import type { ApiResponse, ApiResponseError, ApiResponseSuccess, LoginRequestDto, MemberDto } from '@/types'
+import { handleApiError } from '@/utils/errorHandler'
 
 
 export const useAuthStore = defineStore('auth', {
@@ -36,22 +37,36 @@ export const useAuthStore = defineStore('auth', {
         return true
 
       } catch (err: unknown) {
-        let msg = '로그인에 실패하였습니다.'
-        if (axios.isAxiosError<ApiResponseError>(err) && err.response) {
-          msg = err.response.data.message
-        } else if (err instanceof Error) {
-          msg = err.message
-        }
-        this.errorMessage = msg
-        this.isAuthenticated = false
-        this.user = null
-        return false
-
+        return handleApiError(this,err,'로그인에 실패했습니다.')
       } finally {
         this.isLoading = false
       }
     },
+    /**
+     * 로그아웃
+     * @returns 성공하면 true, 실패하면 false
+     */
+    async logout (): Promise<boolean>{
+      this.isLoading = true
+      this.errorMessage = ''
+      try {
+        await axios.post('/api/auth/logout',{},{ withCredentials: true })
+        this.isAuthenticated = false
+        this.user= null
+        return true
+      } catch (err: unknown) {
+        return handleApiError(this,err,'로그아웃에 실패했습니다.')
+      }finally{
+        this.isLoading = false
+      }
 
+    },
+    /**
+    * HttpOnly 쿠키에 저장된 인증 토큰으로 현재 사용자 정보를 조회한다.
+    * - 조회 성공 시 `user`와 `isAuthenticated`를 업데이트하고 `true`를 반환한다
+    * - 조회 실패 시 `user`와 인증 상태를 초기화하고 `false`를 반환한다
+    * @returns {Promise<boolean>} 요청 성공 여부
+    */
     async fetchMe (): Promise<boolean> {
       this.isLoading = true
       this.errorMessage = ''
@@ -63,7 +78,6 @@ export const useAuthStore = defineStore('auth', {
           { withCredentials: true }
         )
 
-        console.log(res)
         const body = res.data
 
         // 2) business 실패 코드 처리
@@ -81,17 +95,7 @@ export const useAuthStore = defineStore('auth', {
 
       } catch (err: unknown) {
         // 4) 네트워크/서버 에러 처리
-        let msg = '내 정보 조회에 실패했습니다.'
-        if (axios.isAxiosError<ApiResponseError>(err) && err.response) {
-          msg = err.response.data.message
-        } else if (err instanceof Error) {
-          msg = err.message
-        }
-        this.errorMessage = msg
-        this.isAuthenticated = false
-        this.user = null
-        return false
-
+        return handleApiError(this,err,'내 정보 조회에 실패했습니다.')
       } finally {
         // 5) 항상 로딩 해제
         this.isLoading = false
