@@ -64,7 +64,6 @@
 
   const menuStore = useMenuStore();
   const { menus } = storeToRefs(menuStore)
-  console.log(menus)
 
   /** 자식 메뉴 존재 여부 검사 */
   const hasChildren = (menu: MenuClientDto): boolean =>

@@ -33,8 +33,11 @@ export default defineConfig({
       },
       vueTemplate: true,
     }),
+    // Components({
+    //   dts: 'src/components.d.ts',
+    // }),
     Components({
-      dts: 'src/components.d.ts',
+      dirs:['src/components','src/layouts'],
     }),
     Vue({
       template: { transformAssetUrls },
