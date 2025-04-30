@@ -1,6 +1,7 @@
 <template>
   <v-container class="fill-height" fluid>
     <v-row class="fill-height">
+      <!-- 사이드바: 권한 선택 + 트리 -->
       <v-col class="d-flex flex-column" cols="3">
         <v-card class="flex-grow-1">
           <v-card-title class="d-flex align-center" outlined>
@@ -22,6 +23,7 @@
 
           <!-- 권한 선택 -->
           <Combo
+            ref="roleRef"
             v-model="selectedRole"
             :append-items="[{ value: 'all', label: '전체' }]"
             fetch-url="/api/constants/roles"
@@ -32,29 +34,15 @@
 
           <v-divider />
 
-          <!-- 로딩 상태 -->
-          <v-progress-circular
-            v-if="isLoading"
-            class="ma-auto"
-            indeterminate
-            size="24"
-          />
-
-          <!-- 에러 상태 -->
-          <v-alert v-if="errorMsg" dense type="error">
-            {{ errorMsg }}
-          </v-alert>
-
-          <!-- 메뉴 트리 -->
+          <!-- 메뉴 트리 (로딩/에러/Tree 뷰 내부 처리) -->
           <IndexTree
+            ref="treeRef"
             v-model="selectedMenu"
-            :contents="menuTree"
-            item-value="value"
           />
         </v-card>
       </v-col>
 
-      <!-- 상세 정보 영역 -->
+      <!-- 상세 정보 -->
       <v-col cols="9">
         <IndexInfo
           v-if="selectedMenu"
@@ -63,121 +51,60 @@
         />
       </v-col>
     </v-row>
-
   </v-container>
-
 </template>
 
 <script setup lang="ts">
   import { computed, ref, watch } from 'vue'
-  import type { ApiResponse } from '@/types'
   import type { MenuAdminDto } from '@/types/menu.dto'
+  import Combo from '@/components/Combo.vue'
   import IndexTree from '@/pages/System/menu-management/indexTree.vue'
   import IndexInfo from '@/pages/System/menu-management/indexInfo.vue'
-  import Combo from '@/components/Combo.vue'
-  import axios from 'axios'
 
-  // 상태 정의
+  // 상태
   const isCreating = ref(false)
-  const menuTree = ref<MenuAdminDto[]>([])
   const selectedRole = ref<string>('')
   const selectedMenu = ref<MenuAdminDto | null>(null)
-  const isLoading = ref(false)
-  const errorMsg = ref('')
+  const treeRef = ref<InstanceType<typeof IndexTree>>()
+  const roleRef = ref<InstanceType<typeof Combo>>()
+  // 토글 버튼 UI
+  const iconName = computed(() => isCreating.value ? 'mdi-minus' : 'mdi-plus')
+  const buttonLabel= computed(() => isCreating.value ? '취소' : '생성')
 
-  // 버튼 UI
-  const iconName = computed(() => (isCreating.value ? 'mdi-minus' : 'mdi-plus'))
-  const buttonLabel = computed(() => (isCreating.value ? '취소' : '생성'))
 
-  // Placeholder 추가/제거
-  function addPlaceholder () {
-    if (!menuTree.value.some(item => item.id === null)) {
-      const placeholder: MenuAdminDto = {
-        id: null,
-        name: '새 메뉴',
-        description: '',
-        url: '',
-        seq: 0,
-        icon: '',
-        active: false,
-        parentId: null,
-        children: [],
-        roles: [],
-        prevMenuId: null,
-        prevMenuUrl: null,
-        prevMenuName: null,
-        nextMenuId: null,
-        nextMenuUrl: null,
-        nextMenuName: null,
-      };
+  onMounted(() => {
+    treeRef.value?.load('all')
+  })
 
-      menuTree.value.unshift(placeholder);
-      selectedMenu.value = placeholder;
-    }
-  }
 
-  function removePlaceholder () {
-    menuTree.value = menuTree.value.filter(item => item.id !== null)
-    if (selectedMenu.value?.id === null) {
-      selectedMenu.value = null
-    }
-  }
-
-  // 생성 토글 핸들러
-  function toggleCreating (): void {
+  function toggleCreating () {
     isCreating.value = !isCreating.value
-    if (isCreating.value) addPlaceholder()
-    else removePlaceholder()
-  }
-
-  // 메뉴 트리 로드
-  async function loadMenuTree (role: string) {
-
-    if (!role) {
-      menuTree.value = []
-      return
-    }
-
-    isLoading.value = true
-    errorMsg.value = ''
-    try {
-      const response = await axios.get<ApiResponse<MenuAdminDto[]>>(
-        `/api/menus/${role}`,
-      )
-
-      if (response.data.code === 'SUCCESS' && Array.isArray(response.data.data)) {
-        menuTree.value = response.data.data
-      } else {
-        errorMsg.value = response.data.message || '메뉴 조회 실패'
-        menuTree.value = []
-      }
-    } catch (err) {
-      if (!axios.isCancel(err)) {
-        console.error(err)
-        errorMsg.value = '메뉴 API 호출 오류'
-        menuTree.value = []
-      }
-    } finally {
-      isLoading.value = false
+    if (isCreating.value) {
+      treeRef.value?.addPlaceholder()
+    } else {
+      treeRef.value?.removePlaceholder()
     }
   }
 
-  // 권한 변경 시 상태 초기화 및 로드
+  // 권한 변경 시 트리 컴포넌트에 로드 요청
   watch(
     selectedRole,
     role => {
       isCreating.value = false
       selectedMenu.value = null
-      loadMenuTree(role)
+      treeRef.value?.load(role)
     },
     { immediate: true }
   )
 
-  // 메뉴 선택 시 상세 로직
-  watch(selectedMenu, menu => {
-    if (menu && menu.id !== null) {
-      console.log('선택된 메뉴:', menu)
-    // TODO: 상세 API 호출 등
+  // 메뉴 선택 시 상세 처리
+  watch(
+    selectedMenu,
+    menu => {
+      if (menu && menu.id !== null) {
+        console.log('선택된 메뉴:', menu)
+      // TODO: IndexInfo API 호출 등 추가 처리
+      }
     }
-  })
+  )
 </script>

@@ -34,7 +34,7 @@
   // Props 정의
   const props = defineProps<{
     content: Omit<FieldDef, 'temp'>
-    modelValue: any
+    modelValue: unknown
     fetchUrl?: string|null
     fetchParams?: Record<string, string>
     appendItems?: Record<string, string>[]
