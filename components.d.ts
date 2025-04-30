@@ -12,12 +12,17 @@ declare module 'vue' {
     AppDrawer: typeof import('./src/layouts/AppDrawer.vue')['default']
     AppFooter: typeof import('./src/layouts/AppFooter.vue')['default']
     AppMain: typeof import('./src/layouts/AppMain.vue')['default']
+    BaseFormCheckbox: typeof import('./src/components/BaseFormCheckbox.vue')['default']
+    BaseFormField: typeof import('./src/components/BaseFormField.vue')['default']
+    Combo: typeof import('./src/components/Combo.vue')['default']
     Component: typeof import('./src/components/Component.vue')['default']
     DashBoard: typeof import('./src/components/DashBoard.vue')['default']
     Default: typeof import('./src/layouts/default.vue')['default']
+    GlobalCOmboBox: typeof import('./src/components/GlobalCOmboBox.vue')['default']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SearchBar: typeof import('./src/components/SearchBar.vue')['default']
+    Select: typeof import('./src/components/Select.vue')['default']
   }
 }
