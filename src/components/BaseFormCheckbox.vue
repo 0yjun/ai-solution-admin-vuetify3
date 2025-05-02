@@ -6,103 +6,108 @@
       <span v-if="content.color" style="color: red;">*</span>
     </v-col>
 
-    <!-- 체크박스 그룹 -->
+    <!-- Combobox 형태의 멀티 셀렉트 -->
     <v-col cols="10">
       <v-form ref="formRef">
-        <v-checkbox-group
+        <v-combobox
+          ref="comboRef"
           v-model="innerValue"
-          row
+          chips
+          clearable
+          dense
+          :disabled="content.disabled"
+          :item-title="effectiveItemLabel"
+          :item-value="effectiveItemValue"
+          :items="options"
+          :label="content.label"
+          multiple
+          outlined
+          :placeholder="content.placeholder"
           :rules="content.rule"
-        >
-          <v-checkbox
-            v-for="item in items"
-            :key="item[itemValue]"
-            :label="item[itemLabel]"
-            :value="item[itemValue]"
-          />
-        </v-checkbox-group>
+        />
       </v-form>
     </v-col>
   </v-row>
 </template>
 
 <script setup lang="ts">
-  import { computed, onMounted, ref } from 'vue'
+  import { computed, onMounted, ref, watch } from 'vue'
   import axios from 'axios'
-  import type { VCheckbox, VCheckboxGroup, VForm } from 'vuetify/components'
+  import type { VCombobox, VForm } from 'vuetify/components'
   import type { FieldDef } from '@/types'
 
-  // 1) Props: FieldDef에서 temp만 뺀 형태, 그리고 v-model용 배열
+  type ComboItem = Record<string, any>
+
+  // props 정의: content와 v-model, 그리고 선택적 fetchUrl, appendItems, itemLabel, itemValue
   const props = defineProps<{
     content: Omit<FieldDef, 'temp'>
-    modelValue: string[]
+    modelValue: any[]
+    fetchUrl?: string|null
+    appendItems?: ComboItem[]
+    itemLabel?: string
+    itemValue?: string
   }>()
 
-  // 2) update:modelValue event 정의
+  // v-model emit
   const emit = defineEmits<{
-    (e: 'update:modelValue', v: string[]): void
+    (e: 'update:modelValue', v: any[]): void
   }>()
 
-  // 3) form ref (검증용)
+  // form, combo refs
   const formRef = ref<InstanceType<typeof VForm> | null>(null)
+  const comboRef = ref<InstanceType<typeof VCombobox> | null>(null)
 
-  // 4) 체크박스 항목 저장소
-  const items = ref<Record<string, any>[]>([])
+  // effective props 우선순위 및 기본값 처리
+  const effectiveFetchUrl = computed(() => props.fetchUrl ?? props.content.fetchUrl ?? '')
+  const effectiveAppendItems = computed(() => props.appendItems ?? props.content.appendItems ?? [])
+  const effectiveItemLabel = computed(() => props.itemLabel ?? props.content.itemLabel ?? 'label')
+  const effectiveItemValue = computed(() => props.itemValue ?? props.content.itemValue ?? 'value')
 
-  // 5) v-model 내부 바인딩
-  const itemLabel = props.content.itemLabel!
-  const itemValue = props.content.itemValue!
-  const innerValue = computed<string[]>({
-    get: () => props.modelValue || [],
+  // 옵션 리스트
+  const options = ref<ComboItem[]>([])
+
+  // internal v-model 바인딩
+  const innerValue = computed<any[]>({
+    get: () => props.modelValue ?? [],
     set: v => emit('update:modelValue', v),
   })
 
-  // 6) API로부터 항목(fetchUrl), 또는 roles일 때 하드코딩된 URL
-  async function loadItems () {
-    // roles 필드인 경우 고정 URL 사용
-    const url =
-      props.content.key === 'roles'
-        ? '/api/constants/roles'
-        : props.content.fetchUrl
-
-    const baseItems = Array.isArray(props.content.appendItems)
-      ? [...props.content.appendItems]
+  // 옵션 로드 함수
+  async function loadOptions () {
+    const baseItems: ComboItem[] = Array.isArray(effectiveAppendItems.value)
+      ? [...effectiveAppendItems.value]
       : []
-
-    if (!url) {
-      items.value = baseItems
-      return
-    }
-
-    try {
-      const res = await axios.get<{ code: string; data: any[] }>(url)
-      if (res.data.code === 'SUCCESS' && Array.isArray(res.data.data)) {
-        items.value = [
-          ...baseItems,
-          ...res.data.data.map((d: any) => ({
-            [itemLabel]: d[itemLabel],
-            [itemValue]: d[itemValue],
-          })),
-        ]
-      } else {
-        console.error('BaseFormCheckbox: data load failed', res.data)
-        items.value = baseItems
+    let remote: ComboItem[] = []
+    if (effectiveFetchUrl.value) {
+      try {
+        const res = await axios.get<{ code: string; data: ComboItem[] }>(effectiveFetchUrl.value)
+        if (res.data.code === 'SUCCESS' && Array.isArray(res.data.data)) {
+          remote = res.data.data
+        }
+      } catch (err) {
+        console.error('BaseFormCheckbox: data load failed', err)
       }
-    } catch (err) {
-      console.error('BaseFormCheckbox: load error', err)
-      items.value = baseItems
     }
+    options.value = [...baseItems, ...remote]
   }
-  console
 
-  onMounted(loadItems)
+  onMounted(loadOptions)
+  watch(effectiveFetchUrl, loadOptions)
+  watch(effectiveAppendItems, loadOptions, { deep: true })
 
-  // 7) validate / focus 노출
+  // validate, focus 노출
   function validate () {
     return formRef.value?.validate() ?? false
   }
   function focus () {
-  // 체크박스 그룹에 포커스 기능이 필요하다면 구현
+    comboRef.value?.focus()
   }
   defineExpose({ validate, focus })
 </script>
+
+<style>
+.text-required .v-label::after {
+  content: '*';
+  color: red;
+}
+</style>

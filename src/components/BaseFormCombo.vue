@@ -10,14 +10,14 @@
           ref="selectRef"
           v-model="innerValue"
           :autofocus="content.autofocus"
+          :class="{ 'text-required': content.color }"
+          :counter="content.counter && content.maxlength || false"
+          dense
           :disabled="content.disabled"
           :item-title="content.itemLabel"
           :item-value="content.itemValue"
-          dense
           :items="items"
-          :counter="content.counter && content.maxlength || false"
           :label="content.label"
-          :class="{ 'text-required': content.color }"
           outlined
           :placeholder="content.placeholder"
           :rules="content.rule"

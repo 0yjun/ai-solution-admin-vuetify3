@@ -38,7 +38,7 @@
           class="mb-4"
           :content="f"
           :fetch-url="f.fetchUrl"
-          :item-label="f.label"
+          :item-label="f.itemLabel"
           :item-value="f.itemValue"
         />
 
@@ -57,8 +57,7 @@
       </v-card-subtitle>
     </template>
     <v-card-actions class="justify-end">
-      <v-btn text @click="$emit('cancel')">취소</v-btn>
-      <v-btn color="primary" @click="onSave">
+      <v-btn color="primary" @click.stop.prevent="onSave">
         {{ dto.id ? '수정' : '생성' }}
       </v-btn>
     </v-card-actions>
@@ -68,7 +67,7 @@
 <script setup lang="ts">
   import { computed, reactive, ref, watch } from 'vue'
   import BaseFormField from '@/components/BaseFormField.vue'
-  import BaseFormCheckbox from '@/components/BaseFormCombo.vue'
+  import BaseFormCheckbox from '@/components/BaseFormCheckbox.vue'
   import type { FieldDef, MenuAdminDto } from '@/types';
   import BaseFormCombo from '@/components/BaseFormCombo.vue';
 
@@ -116,7 +115,7 @@
       color: false,
       fetchUrl: '/api/constants/roles',
       message: '메뉴권한을 확인해주세요.',
-      rule: [],
+      rule: [(v: string) => v.length!==0 || '메뉴 권한은 필수입니다.'],
     },
     {
       key: 'parentId',
@@ -286,15 +285,23 @@
   const fieldRefs = ref<InstanceType<typeof BaseFormField>[]>([])
 
   // 6) 부모가 호출할 수 있는 메서드 노출 (검증·값추출 등)
-  const checkAll = (): boolean => {
+  const checkAll = async (): Promise<boolean> => {
     for (const comp of fieldRefs.value) {
-      if (!comp.validate()) {
+      // 1) comp.validate() 결과를 받고
+      const result = await comp.validate()
+      // 2) boolean인지, 객체인지 판별해서 진짜 유효 플래그를 꺼냅니다.
+      const isValid = typeof result === 'boolean'
+        ? result
+        : (result.valid as boolean)
+
+      if (!isValid) {
         comp.focus()
         return false
       }
     }
     return true
   }
+
   const getValues = (): Record<string, string> => {
     const result: Record<string, string> = {}
     for (const f of fields) {
@@ -302,16 +309,20 @@
     }
     return result
   }
+
   defineExpose({ checkAll, getValues })
 
   // 7) 부모로 보낼 이벤트 정의
   const emit = defineEmits<{
     (e: 'save', payload: Record<string, string>): void
   }>()
-  function onSave () {
-    // 유효성 검사
-    if (!checkAll()) return
-    // 유효하면 부모로 값 전달
+  async function onSave () {
+    // 반드시 await로 검사
+    if (!(await checkAll())) {
+      console.log('유효성 검사 실패')
+      return
+    }
+    // 유효할 때만 emit
     emit('save', getValues())
   }
 </script>

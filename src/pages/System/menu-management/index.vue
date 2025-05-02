@@ -113,7 +113,18 @@
   // 메뉴 저장
   async function saveMenu (payload: Record<string, string>) {
     if (!selectedMenu.value) return
-    console.log(saveMenu)
+
+    payload.roles = payload.roles.map(roleItem => {
+      // 객체이고 value 프로퍼티가 있으면 value 꺼내기
+      if (roleItem != null
+        && typeof roleItem === 'object'
+        && 'value' in roleItem) {
+        return (roleItem as { value: string }).value
+      }
+      // 그 외엔 그대로
+      return roleItem
+    })
+
     const isNew = selectedMenu.value.id == null
     const url = isNew
       ? '/api/menus'
