@@ -12,7 +12,6 @@
           ref="comboRef"
           v-model="innerValue"
           chips
-          class="search-title"
           :class="{ 'text-required': content.color}"
           clearable
           dense

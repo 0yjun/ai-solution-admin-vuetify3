@@ -19,7 +19,9 @@
     </v-card-title>
     <v-divider />
     <template v-for="(f, idx) in fields" :key="f.key">
-      <v-card-subtitle class="pa-3">
+      <v-card-subtitle
+        class="pa-3 search-title"
+      >
         <!-- text, number 둘 다 BaseFormField 로 처리 -->
         <BaseFormField
           v-if="f.type === 'text' || f.type === 'number'"

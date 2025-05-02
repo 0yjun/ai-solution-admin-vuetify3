@@ -10,7 +10,6 @@
           ref="selectRef"
           v-model="innerValue"
           :autofocus="content.autofocus"
-          class="search-title"
           :class="{ 'text-required': content.color}"
           :counter="content.counter && content.maxlength || false"
           dense
