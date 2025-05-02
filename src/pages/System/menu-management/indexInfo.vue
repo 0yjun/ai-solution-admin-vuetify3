@@ -31,6 +31,19 @@
 
         <!-- combo 타입은 BaseFormCombo 로 처리 -->
         <BaseFormCheckbox
+          v-else-if="f.type === 'checkbox'"
+          ref="fieldRefs"
+          v-model="fields[idx].text"
+          :append-items="f.appendItems"
+          class="mb-4"
+          :content="f"
+          :fetch-url="f.fetchUrl"
+          :item-label="f.label"
+          :item-value="f.itemValue"
+        />
+
+        <!-- combo 타입은 BaseFormCombo 로 처리 -->
+        <BaseFormCombo
           v-else-if="f.type === 'combo'"
           ref="fieldRefs"
           v-model="fields[idx].text"
@@ -43,14 +56,21 @@
         />
       </v-card-subtitle>
     </template>
+    <v-card-actions class="justify-end">
+      <v-btn text @click="$emit('cancel')">취소</v-btn>
+      <v-btn color="primary" @click="onSave">
+        {{ dto.id ? '수정' : '생성' }}
+      </v-btn>
+    </v-card-actions>
   </v-card>
 </template>
 
 <script setup lang="ts">
   import { computed, reactive, ref, watch } from 'vue'
   import BaseFormField from '@/components/BaseFormField.vue'
-  import BaseFormCheckbox from '@/components/BaseFormCheckbox.vue'
+  import BaseFormCheckbox from '@/components/BaseFormCombo.vue'
   import type { FieldDef, MenuAdminDto } from '@/types';
+  import BaseFormCombo from '@/components/BaseFormCombo.vue';
 
   // 1) props 정의: 배열 또는 단일 객체 모두 받기
   const props = defineProps<{
@@ -91,9 +111,10 @@
       disabled: false,
       maxlength: null,
       counter: false,
-      type: 'array',
+      type: 'checkbox',
       autofocus: false,
       color: false,
+      fetchUrl: '/api/constants/roles',
       message: '메뉴권한을 확인해주세요.',
       rule: [],
     },
@@ -265,22 +286,32 @@
   const fieldRefs = ref<InstanceType<typeof BaseFormField>[]>([])
 
   // 6) 부모가 호출할 수 있는 메서드 노출 (검증·값추출 등)
-  defineExpose({
-    checkAll: (): boolean => {
-      for (const comp of fieldRefs.value) {
-        if (!comp.validate()) {
-          comp.focus()
-          return false
-        }
+  const checkAll = (): boolean => {
+    for (const comp of fieldRefs.value) {
+      if (!comp.validate()) {
+        comp.focus()
+        return false
       }
-      return true
-    },
-    getValues (): Record<string, string> {
-      const result: Record<string, string> = {}
-      for (const f of fields) {
-        result[f.key] = f.text
-      }
-      return result
-    },
-  })
+    }
+    return true
+  }
+  const getValues = (): Record<string, string> => {
+    const result: Record<string, string> = {}
+    for (const f of fields) {
+      result[f.key] = f.text
+    }
+    return result
+  }
+  defineExpose({ checkAll, getValues })
+
+  // 7) 부모로 보낼 이벤트 정의
+  const emit = defineEmits<{
+    (e: 'save', payload: Record<string, string>): void
+  }>()
+  function onSave () {
+    // 유효성 검사
+    if (!checkAll()) return
+    // 유효하면 부모로 값 전달
+    emit('save', getValues())
+  }
 </script>

@@ -10,7 +10,7 @@ export interface FieldDef {
   disabled: boolean
   maxlength: number | null
   counter: boolean
-  type: 'text'|'number'|'combo'|'array'
+  type: 'text'|'number'|'combo'|'checkbox'
   autofocus: boolean
   color: boolean
   message: string

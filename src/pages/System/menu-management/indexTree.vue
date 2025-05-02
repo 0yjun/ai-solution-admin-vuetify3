@@ -46,7 +46,6 @@
    * @param role 권한 문자열
    */
   async function load (role: string) {
-    console.log('load tree')
     loading.value = true
     errorMsg.value = ''
     menuTree.value = []

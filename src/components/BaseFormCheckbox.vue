@@ -1,114 +1,108 @@
 <template>
-  <v-row v-bind="attrs">
-    <v-col cols="2">{{ content.label }}</v-col>
+  <v-row>
+    <!-- 레이블 및 필수 표시 -->
+    <v-col cols="2">
+      {{ content.label }}
+      <span v-if="content.color" style="color: red;">*</span>
+    </v-col>
+
+    <!-- 체크박스 그룹 -->
     <v-col cols="10">
       <v-form ref="formRef">
-        <v-select
-          ref="selectRef"
+        <v-checkbox-group
           v-model="innerValue"
-          :autofocus="content.autofocus"
-          :class="{ 'text-required': content.color }"
-          dense
-          :disabled="content.disabled"
-          :item-title="itemLabel"
-          :item-value="itemValue"
-          :items="items"
-          :label="content.label"
-          outlined
-          :placeholder="content.placeholder"
+          row
           :rules="content.rule"
-        />
+        >
+          <v-checkbox
+            v-for="item in items"
+            :key="item[itemValue]"
+            :label="item[itemLabel]"
+            :value="item[itemValue]"
+          />
+        </v-checkbox-group>
       </v-form>
-      {{ innerValue }}
     </v-col>
   </v-row>
 </template>
 
 <script setup lang="ts">
-  import { computed, onMounted, ref, useAttrs, watch } from 'vue'
+  import { computed, onMounted, ref } from 'vue'
   import axios from 'axios'
-  import type { ApiResponse, FieldDef, MenuAdminDto } from '@/types'
-  import type { VForm } from 'vuetify/components'
-  import type { VSelect } from 'vuetify/components'
+  import type { VCheckbox, VCheckboxGroup, VForm } from 'vuetify/components'
+  import type { FieldDef } from '@/types'
 
-  // Props 정의
+  // 1) Props: FieldDef에서 temp만 뺀 형태, 그리고 v-model용 배열
   const props = defineProps<{
     content: Omit<FieldDef, 'temp'>
-    modelValue: unknown
-    fetchUrl?: string|null
-    fetchParams?: Record<string, string>
-    appendItems?: Record<string, string>[]
-    itemLabel?: string
-    itemValue?: string
+    modelValue: string[]
   }>()
 
+  // 2) update:modelValue event 정의
   const emit = defineEmits<{
-    (e: 'update:modelValue', v: any): void
+    (e: 'update:modelValue', v: string[]): void
   }>()
 
-  // 부모로부터 받은 class/style 등을 v-row에 전달
-  const attrs = useAttrs()
+  // 3) form ref (검증용)
+  const formRef = ref<InstanceType<typeof VForm> | null>(null)
 
-  // refs for form & select
-  const formRef = ref<VForm|null>(null)
-  const selectRef = ref<VSelect|null>(null)
+  // 4) 체크박스 항목 저장소
+  const items = ref<Record<string, any>[]>([])
 
-  // 완전 제어형 컴포넌트(v-model)
-  const innerValue = computed({
-    get:  () => props.modelValue,
+  // 5) v-model 내부 바인딩
+  const itemLabel = props.content.itemLabel!
+  const itemValue = props.content.itemValue!
+  const innerValue = computed<string[]>({
+    get: () => props.modelValue || [],
     set: v => emit('update:modelValue', v),
   })
 
-  watch(innerValue,newvalue=>console.log(newvalue))
-
-  // 콤보 박스 아이템 목록
-  const items = ref<Record<string, any>[]>([])
-  const prefix = props.appendItems ?? []
-
+  // 6) API로부터 항목(fetchUrl), 또는 roles일 때 하드코딩된 URL
   async function loadItems () {
-    if (props.fetchUrl) {
-      try {
-        const res = await axios.get<ApiResponse<MenuAdminDto>>(props.fetchUrl, {
-          params: props.fetchParams,
-        })
-        if(res.data.code==='SUCCESS'){
-          const resData = res.data.data
-          items.value = [...prefix, ...resData]
-        }
-      } catch (e) {
-        console.error('BaseFormCombo loadItems failed', e)
-        items.value = [...prefix]
+    // roles 필드인 경우 고정 URL 사용
+    const url =
+      props.content.key === 'roles'
+        ? '/api/constants/roles'
+        : props.content.fetchUrl
+
+    const baseItems = Array.isArray(props.content.appendItems)
+      ? [...props.content.appendItems]
+      : []
+
+    if (!url) {
+      items.value = baseItems
+      return
+    }
+
+    try {
+      const res = await axios.get<{ code: string; data: any[] }>(url)
+      if (res.data.code === 'SUCCESS' && Array.isArray(res.data.data)) {
+        items.value = [
+          ...baseItems,
+          ...res.data.data.map((d: any) => ({
+            [itemLabel]: d[itemLabel],
+            [itemValue]: d[itemValue],
+          })),
+        ]
+      } else {
+        console.error('BaseFormCheckbox: data load failed', res.data)
+        items.value = baseItems
       }
-    } else {
-      items.value = [...prefix]
+    } catch (err) {
+      console.error('BaseFormCheckbox: load error', err)
+      items.value = baseItems
     }
   }
+  console
 
-  // 마운트 시, 그리고 fetchUrl/params/appendItems 변경 시 재로딩
   onMounted(loadItems)
-  watch(
-    () => [props.fetchUrl, props.fetchParams, props.appendItems],
-    loadItems,
-    { deep: true }
-  )
 
-  // 외부에서 호출 가능한 메서드들
+  // 7) validate / focus 노출
   function validate () {
     return formRef.value?.validate() ?? false
   }
   function focus () {
-    selectRef.value?.focus()
+  // 체크박스 그룹에 포커스 기능이 필요하다면 구현
   }
-  function getValue () {
-    return innerValue.value
-  }
-  function setValue (v: any) {
-    emit('update:modelValue', v)
-  }
-
-  defineExpose({ validate, focus, getValue, setValue })
-
-  // 기본 itemLabel/itemValue
-  const itemLabel = props.itemLabel || 'label'
-  const itemValue = props.itemValue || 'value'
+  defineExpose({ validate, focus })
 </script>

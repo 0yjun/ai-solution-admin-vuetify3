@@ -48,6 +48,7 @@
           v-if="selectedMenu"
           :contents="selectedMenu"
           style="height: min-content; overflow-y: auto;"
+          @save="saveMenu"
         />
       </v-col>
     </v-row>
@@ -60,6 +61,8 @@
   import Combo from '@/components/Combo.vue'
   import IndexTree from '@/pages/System/menu-management/indexTree.vue'
   import IndexInfo from '@/pages/System/menu-management/indexInfo.vue'
+  import type { ApiResponse } from '@/types'
+  import axios from 'axios'
 
   // 상태
   const isCreating = ref(false)
@@ -107,4 +110,31 @@
       }
     }
   )
+  // 메뉴 저장
+  async function saveMenu (payload: Record<string, string>) {
+    if (!selectedMenu.value) return
+    console.log(saveMenu)
+    const isNew = selectedMenu.value.id == null
+    const url = isNew
+      ? '/api/menus'
+      : `/api/menus/${selectedMenu.value.id}`
+
+    try {
+      // POST 혹은 PUT 메서드 선택
+      const method = isNew ? 'post' : 'put'
+      const res = await (axios)[method]<ApiResponse<MenuAdminDto>>(url, payload)
+
+      if (res.data.code === 'SUCCESS' && res.data.data) {
+        // 저장 성공: 트리 재로드, 상세 선택 갱신
+        await treeRef.value?.load(selectedRole.value)
+        selectedMenu.value = res.data.data
+      } else {
+        // 저장 실패: 콘솔에 오류 메시지 출력
+        console.error('저장 실패:', res.data.message)
+      }
+    } catch (err) {
+      // 네트워크 혹은 예외 발생 시 콘솔에 출력
+      console.error('저장 중 오류 발생:', err)
+    }
+  }
 </script>
