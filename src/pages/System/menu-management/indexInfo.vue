@@ -19,14 +19,14 @@
     </v-card-title>
     <v-divider />
     <template v-for="(f, idx) in fields" :key="f.key">
-      <v-card-subtitle>
+      <v-card-subtitle class="pa-3">
         <!-- text, number 둘 다 BaseFormField 로 처리 -->
         <BaseFormField
           v-if="f.type === 'text' || f.type === 'number'"
           ref="fieldRefs"
           v-model="fields[idx].text"
-          class="mb-4"
           :content="f"
+          hide-details
         />
 
         <!-- combo 타입은 BaseFormCombo 로 처리 -->
@@ -35,9 +35,9 @@
           ref="fieldRefs"
           v-model="fields[idx].text"
           :append-items="f.appendItems"
-          class="mb-4"
           :content="f"
           :fetch-url="f.fetchUrl"
+          hide-details
           :item-label="f.itemLabel"
           :item-value="f.itemValue"
         />
@@ -48,19 +48,27 @@
           ref="fieldRefs"
           v-model="fields[idx].text"
           :append-items="f.appendItems"
-          class="mb-4"
           :content="f"
           :fetch-url="f.fetchUrl"
+          hide-details
           :item-label="f.itemLabel"
           :item-value="f.itemValue"
         />
+        <v-divider />
       </v-card-subtitle>
     </template>
-    <v-card-actions class="justify-end">
-      <v-btn color="primary" @click.stop.prevent="onSave">
-        {{ dto.id ? '수정' : '생성' }}
-      </v-btn>
-    </v-card-actions>
+    <v-card-subtitle class="d-flex justify-end ga-3 pb-3">
+      <v-btn
+        color="primary"
+        :text="dto.id ? '수정' : '생성' "
+        @click.stop.prevent="onSave"
+      />
+      <v-btn
+        color="error"
+        text="삭제"
+        @click.stop.prevent="()=>{}"
+      />
+    </v-card-subtitle>
   </v-card>
 </template>
 
@@ -112,7 +120,7 @@
       counter: false,
       type: 'checkbox',
       autofocus: false,
-      color: false,
+      color: true,
       fetchUrl: '/api/constants/roles',
       message: '메뉴권한을 확인해주세요.',
       rule: [(v: string) => v.length!==0 || '메뉴 권한은 필수입니다.'],
@@ -127,7 +135,7 @@
       counter: false,
       type: 'combo',
       autofocus: false,
-      color: false,
+      color: true,
       message: '상위메뉴를 확인해주세요.',
       rule: [],
       fetchUrl: '/api/menus/all',

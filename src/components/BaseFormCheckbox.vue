@@ -1,8 +1,7 @@
 <template>
-  <v-row>
+  <v-row row-gap="0">
     <!-- 레이블 및 필수 표시 -->
-    <v-col cols="2">
-      {{ content.label }}
+    <v-col class="pb-0 pt-0" sm="2">{{ content.label }}
       <span v-if="content.color" style="color: red;">*</span>
     </v-col>
 
@@ -13,6 +12,8 @@
           ref="comboRef"
           v-model="innerValue"
           chips
+          class="search-title"
+          :class="{ 'text-required': content.color}"
           clearable
           dense
           :disabled="content.disabled"

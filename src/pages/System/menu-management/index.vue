@@ -1,10 +1,10 @@
 <template>
-  <v-container class="fill-height" fluid>
+  <v-container class="fill-height fluid pb-0 pt-0 pl-3 pr-3" fluid>
     <v-row class="fill-height">
       <!-- 사이드바: 권한 선택 + 트리 -->
-      <v-col class="d-flex flex-column" cols="3">
-        <v-card class="flex-grow-1">
-          <v-card-title class="d-flex align-center" outlined>
+      <v-col cols="3">
+        <v-card class="fill-height d-flex flex-column">
+          <v-card-title class="d-flex align-center list-title" outlined>
             <span class="font-weight-black flex-grow-1">메뉴</span>
             <v-tooltip :text="buttonLabel">
               <template #activator="{ props }">
@@ -19,26 +19,33 @@
               </template>
             </v-tooltip>
           </v-card-title>
+
           <v-divider />
 
           <!-- 권한 선택 -->
-          <Combo
-            ref="roleRef"
-            v-model="selectedRole"
-            :append-items="[{ value: 'all', label: '전체' }]"
-            fetch-url="/api/constants/roles"
-            item-label="label"
-            item-value="value"
-            label="권한등급"
-          />
-
+          <div
+            class="pa-3"
+          >
+            <Combo
+              ref="roleRef"
+              v-model="selectedRole"
+              :append-items="[{ value: 'all', label: '전체' }]"
+              fetch-url="/api/constants/roles"
+              hide-detail
+              item-label="label"
+              item-value="value"
+              label="권한등급"
+            />
+          </div>
           <v-divider />
 
           <!-- 메뉴 트리 (로딩/에러/Tree 뷰 내부 처리) -->
-          <IndexTree
-            ref="treeRef"
-            v-model="selectedMenu"
-          />
+          <div class="flex-grow-1">
+            <IndexTree
+              ref="treeRef"
+              v-model="selectedMenu"
+            />
+          </div>
         </v-card>
       </v-col>
 

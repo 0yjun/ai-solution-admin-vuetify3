@@ -3,6 +3,7 @@
     :class="{ 'text-required': required }"
     dense
     :disabled="disabled"
+    hide-details
     :item-title="'label'"
     :item-value="'value'"
     :items="items"

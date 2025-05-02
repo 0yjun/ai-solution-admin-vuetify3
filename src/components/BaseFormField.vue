@@ -1,6 +1,6 @@
 <template>
   <v-row>
-    <v-col cols="2">{{ content.label }}
+    <v-col class="pb-0 pt-0" sm="2">{{ content.label }}
       <span
         v-if="content.color"
         style="color: red;"
@@ -8,12 +8,13 @@
         *
       </span>
     </v-col>
-    <v-col cols="10">
+    <v-col class="pb-0 pt-0" sm="10">
       <v-form ref="formRef">
         <v-text-field
           ref="inputRef"
           v-model="innerValue"
           :autofocus="content.autofocus"
+          class="search-title"
           :class="{ 'text-required': content.color }"
           :counter="content.counter && content.maxlength || false"
           dense

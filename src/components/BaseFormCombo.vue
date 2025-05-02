@@ -1,16 +1,17 @@
 <template>
-  <v-row>
-    <v-col cols="2">
+  <v-row row-gap="0">
+    <v-col class="pb-0 pt-0" sm="2">
       {{ content.label }}
       <span v-if="content.color" style="color: red;">*</span>
     </v-col>
-    <v-col cols="10">
+    <v-col class="pb-0 pt-0" sm="10">
       <v-form ref="formRef">
         <v-select
           ref="selectRef"
           v-model="innerValue"
           :autofocus="content.autofocus"
-          :class="{ 'text-required': content.color }"
+          class="search-title"
+          :class="{ 'text-required': content.color}"
           :counter="content.counter && content.maxlength || false"
           dense
           :disabled="content.disabled"

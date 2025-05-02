@@ -23,6 +23,9 @@ app.use(pinia);
 
 registerPlugins(app);
 
+// scss
+import '@/styles/global.scss'
+
 // 새로고침시 JWT로 세션 유지
 import { useAuthStore } from './stores';
 const authStore = useAuthStore()

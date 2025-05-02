@@ -1,5 +1,10 @@
 <template>
-  <v-app-bar app elevation="2" title="AI Solution Management">
+  <v-app-bar
+    app
+    density="comfortable"
+    elevation="2"
+    title="AI Solution Management"
+  >
     <template #prepend>
       <!-- 데스크탑: 미니 토글 -->
       <v-app-bar-nav-icon class="hidden-sm-and-down" @click="onDrawerMiniClick">
