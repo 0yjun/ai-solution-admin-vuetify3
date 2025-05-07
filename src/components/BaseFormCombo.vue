@@ -13,6 +13,7 @@
           :class="{ 'text-required': content.color}"
           :counter="content.counter && content.maxlength || false"
           dense
+          density="compact"
           :disabled="content.disabled"
           :item-title="content.itemLabel"
           :item-value="content.itemValue"

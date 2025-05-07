@@ -36,50 +36,33 @@
   //   }
   // }
   .search-title {
-    // ─── 디테일·입력 영역 여백/패딩 초기화 ───
-    .v-text-field__details,
-    .v-field__input,
-    .v-input__details {
-      margin-bottom: 0 !important;
-      padding-top: 0 !important;
-    }
-  
-    // ─── 입력 컨트롤 높이 조정 ───
+    .v-text-field {
+      height: 50px; // 원하는 높이값
+      font-size: 11px !important;
+
     .v-input__control {
-      height: 45px !important;
-    }
-  
-    // ─── 플로팅 라벨 위치 조정 (Density Default + 여러 Variant) ───
-    .v-input--density-default {
-      .v-field--variant-solo    .v-label.v-field-label--floating,
-      .v-field--variant-solo-inverted .v-label.v-field-label--floating,
-      .v-field--variant-filled  .v-label.v-field-label--floating,
-      .v-field--variant-solo-filled .v-label.v-field-label--floating {
-        top: 0 !important;
+        height: 40px;
+        font-size: 11px !important;
+
+        input {
+            min-height: 22px;
+            font-size: 11px !important;
+        }
+        label {
+          min-height: 22px;
+          font-size: 11px !important;
       }
     }
-  
-    // ─── 셀렉트 선택 텍스트 크기 ───
-    .v-select__selection-text {
-      font-size: 11px !important;
-    }
-  
-    // ─── 라벨 여백·폰트 크기 ───
-    label {
-      margin-bottom: 0 !important;
-      font-size: 11px !important;
-      top: 5px !important;
-    }
-  
-    // ─── 실제 입력(input) 요소 폰트·패딩 ───
-    input {
-      font-size: 11px !important;
-      padding-top: 4px !important;
-    }
-  
-    // ─── 메시지·카운터 폰트 크기 ───
-    .v-messages__message,
-    .v-counter {
-      font-size: 11px !important;
+
+    .v-input__details {
+      padding-top: 0px;
+      .v-messages__message {
+        font-size: 11px !important;
+        line-height: 0px;
+      }
     }
   }
+  .v-select__selection-text {
+    font-size: 11px !important;
+  }
+}
