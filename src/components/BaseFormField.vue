@@ -8,6 +8,12 @@
         *
       </span>
     </v-col>
+
+    <v-divider
+      class="w-0"
+      vertical
+    />
+
     <v-col sm="10">
       <v-form ref="formRef">
         <v-text-field

@@ -5,6 +5,10 @@
       <span v-if="content.color" style="color: red;">*</span>
     </v-col>
 
+    <v-divider
+      class="w-0"
+      vertical
+    />
     <!-- Combobox 형태의 멀티 셀렉트 -->
     <v-col cols="10">
       <v-form ref="formRef">

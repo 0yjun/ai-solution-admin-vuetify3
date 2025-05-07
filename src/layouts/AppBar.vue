@@ -1,8 +1,10 @@
 <template>
   <v-app-bar
     app
-    density="comfortable"
-    elevation="2"
+    class="border-b"
+    elevation="0"
+    flat
+    height="51"
     title="AI Solution Management"
   >
     <template #prepend>

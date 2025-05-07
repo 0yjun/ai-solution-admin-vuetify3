@@ -7,11 +7,14 @@
     :rail="drawerMini"
     :width="256"
   >
-    <v-list>
+    <v-list
+      style="height: 50px; color: white; font-size: 32px;"
+    >
       <v-list-item
-        class="mt-2 drawer-logo"
+        class="drawer-logo fill-height d-flex align-center"
         prepend-icon="AI"
         title="AI SOLUTION"
+        to="/"
       />
     </v-list>
     <v-divider />

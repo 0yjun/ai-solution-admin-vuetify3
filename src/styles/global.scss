@@ -1,31 +1,40 @@
+@use './settings';
+
+
+:root {
+  /* 데스크톱에서 72px, 모바일에서 56px로 높이 변경 */
+  --v-app-bar-height: 72px;
+  --v-app-bar-height-mobile: 72px;
+}
+
 .list-title {
-    background-color: #d6f2f1 !important;
-  }
+  background-color: #d6f2f1 !important;
+}
 
-  .v-card {
-    & .v-card-title {
-      font-size: 16px !important;
-      padding: 8px 14px !important;
-      height: 52px !important;
-    }
+.v-card {
+  & .v-card-title {
+    font-size: 16px !important;
+    padding: 8px 14px !important;
+    height: 52px !important;
   }
+}
 
-  .search-title {
-    .v-text-field {
-      height: 50px; // 원하는 높이값
-      font-size: 11px !important;
+.search-title {
+  .v-text-field {
+    height: 55px; // 원하는 높이값
+    font-size: 11px !important;
 
     .v-input__control {
-        height: 38px;
-        font-size: 11px !important;
+      height: 38px;
+      font-size: 11px !important;
 
-        input {
-            min-height: 22px;
-            font-size: 11px !important;
-        }
-        label {
+      input {
           min-height: 22px;
           font-size: 11px !important;
+      }
+      label {
+        min-height: 22px;
+        font-size: 11px !important;
       }
     }
 
@@ -37,6 +46,7 @@
       }
     }
   }
+
   .v-select__selection-text {
     font-size: 11px !important;
   }

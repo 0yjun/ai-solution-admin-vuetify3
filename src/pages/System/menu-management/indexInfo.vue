@@ -56,8 +56,12 @@
           :item-label="f.itemLabel"
           :item-value="f.itemValue"
         />
-        <v-divider />
+
       </v-card-subtitle>
+
+      <v-divider
+        class="fill-width"
+      />
     </template>
     <v-card-subtitle class="d-flex justify-end ga-3 pb-3">
       <v-btn
