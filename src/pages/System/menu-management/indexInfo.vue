@@ -80,6 +80,7 @@
   import BaseFormCheckbox from '@/components/BaseFormCheckbox.vue'
   import type { FieldDef, MenuAdminDto } from '@/types';
   import BaseFormCombo from '@/components/BaseFormCombo.vue';
+  import { errorMessages } from 'vue/compiler-sfc';
 
   // 1) props 정의: 배열 또는 단일 객체 모두 받기
   const props = defineProps<{
@@ -292,7 +293,12 @@
   }, { immediate: true })
 
   // 5) 자식 컴포넌트 참조 수집
-  const fieldRefs = ref<InstanceType<typeof BaseFormField>[]>([])
+  type FormComponentInstance =
+    | InstanceType<typeof BaseFormField>
+    | InstanceType<typeof BaseFormCheckbox>
+    | InstanceType<typeof BaseFormCombo>
+
+  const fieldRefs = ref<FormComponentInstance[]>([])
 
   // 6) 부모가 호출할 수 있는 메서드 노출 (검증·값추출 등)
   const checkAll = async (): Promise<boolean> => {
@@ -305,6 +311,10 @@
         : (result.valid as boolean)
 
       if (!isValid) {
+        const content = comp.$props?.content
+        const errorMsg = content?.message || '유효성 검증에 실패했습니다.'
+        console.error(errorMsg)
+        alert(errorMsg)
         comp.focus()
         return false
       }

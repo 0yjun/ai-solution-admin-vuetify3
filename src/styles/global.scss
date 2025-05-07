@@ -4,44 +4,19 @@
 
   .v-card {
     & .v-card-title {
-      /* Vuetify 기본(.v-card .v-card-title)보다 specificity가 같거나 더 높아서 무조건 덮어씁니다 */
       font-size: 16px !important;
       padding: 8px 14px !important;
       height: 52px !important;
     }
   }
 
-  .v-font-16 {
-    /* 자기 자신과 모든 자손(*)에게 적용 */
-    &, 
-    & * {
-      font-size: 12px !important;
-    }
-  }
-
-  // .search-title {
-  //   .v-input__control{
-  //     .v-field {
-  //       .v-field__field{
-  //         input{
-  //           padding-top: 4px;
-  //           height: 32px;
-  //         }
-  //       }
-  //     }
-  //   }
-  //   .v-input__details{
-  //     padding-top: 0px;
-
-  //   }
-  // }
   .search-title {
     .v-text-field {
       height: 50px; // 원하는 높이값
       font-size: 11px !important;
 
     .v-input__control {
-        height: 40px;
+        height: 38px;
         font-size: 11px !important;
 
         input {

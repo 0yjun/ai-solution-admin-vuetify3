@@ -68,7 +68,7 @@
   import Combo from '@/components/Combo.vue'
   import IndexTree from '@/pages/System/menu-management/indexTree.vue'
   import IndexInfo from '@/pages/System/menu-management/indexInfo.vue'
-  import type { ApiResponse } from '@/types'
+  import type { ApiResponse, ApiResponseError } from '@/types'
   import axios from 'axios'
 
   // 상태
@@ -118,41 +118,49 @@
     }
   )
   // 메뉴 저장
-  async function saveMenu (payload: Record<string, string>) {
-    if (!selectedMenu.value) return
+  async function saveMenu (payload: Record<string,string>) {
+    // 1) 메뉴가 선택되지 않았다면 중단
+    if (!selectedMenu.value) {
+      console.warn('저장할 메뉴가 선택되지 않았습니다.');
+      return;
+    }
 
-    payload.roles = payload.roles.map(roleItem => {
-      // 객체이고 value 프로퍼티가 있으면 value 꺼내기
-      if (roleItem != null
-        && typeof roleItem === 'object'
-        && 'value' in roleItem) {
-        return (roleItem as { value: string }).value
+    // 2) roles 배열내에 { value: string } 형태가 있으면 string으로 추출
+    payload.roles = payload.roles.map(role => {
+      if (role && typeof role === 'object' && 'value' in role) {
+        return role.value;
       }
-      // 그 외엔 그대로
-      return roleItem
-    })
+      return role;
+    });
 
-    const isNew = selectedMenu.value.id == null
-    const url = isNew
-      ? '/api/menus'
-      : `/api/menus/${selectedMenu.value.id}`
+    // 3) selectedMenu가 배열이면 첫 번째 요소, 아니면 단일 객체
+    const menuItem = Array.isArray(selectedMenu.value)
+      ? selectedMenu.value[0]
+      : selectedMenu.value;
+
+    const menuId = menuItem.id;
+    const isUpdate = Number.isInteger(menuId);
+
+    // 4) HTTP 메서드와 URL 결정
+    const method = isUpdate ? 'put' : 'post';
+    const url = isUpdate ? `/api/menus/${menuId}` : '/api/menus';
 
     try {
-      // POST 혹은 PUT 메서드 선택
-      const method = isNew ? 'post' : 'put'
-      const res = await (axios)[method]<ApiResponse<MenuAdminDto>>(url, payload)
-
-      if (res.data.code === 'SUCCESS' && res.data.data) {
-        // 저장 성공: 트리 재로드, 상세 선택 갱신
-        await treeRef.value?.load(selectedRole.value)
-        selectedMenu.value = res.data.data
-      } else {
-        // 저장 실패: 콘솔에 오류 메시지 출력
-        console.error('저장 실패:', res.data.message)
+      // 5) Axios 호출
+      const response = await axios[method]<ApiResponse<MenuAdminDto>>(url, payload);
+      if(response.data.code === 'SUCCESS'){
+        await treeRef.value?.load(selectedRole.value);
+        selectedMenu.value = response.data.data;
+        alert(response.data.message)
       }
     } catch (err) {
-      // 네트워크 혹은 예외 발생 시 콘솔에 출력
-      console.error('저장 중 오류 발생:', err)
+      let errorMessage = ''
+      if(axios.isAxiosError<ApiResponseError>(err) && err.response){
+        errorMessage = err.response.data.message
+      }else if(err instanceof Error){
+        errorMessage = err.message
+      }
+      alert(errorMessage)
     }
   }
 </script>
