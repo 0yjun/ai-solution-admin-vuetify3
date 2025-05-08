@@ -26,7 +26,7 @@
                     class="white--text font-weight-medium"
                     style="font-size:23px; letter-spacing:1px;"
                   >
-                    DataOps
+                    AI Solution
                   </div>
                 </v-col>
               </v-row>

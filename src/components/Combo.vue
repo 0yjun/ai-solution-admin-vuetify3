@@ -37,6 +37,8 @@
   const { fetchUrl, fetchParams,appendItems } = toRefs(props)
   const items:Ref<comboItemType[]>= ref([])
 
+  const emit = defineEmits(['update:modelValue'])
+
   async function loadItems () {
     // 1) 부모가 준 appendItems
     const prefix = [...appendItems.value]
@@ -60,11 +62,14 @@
 
     // 3) 항상 appendItems를 앞에 붙여서 최종 items 세팅
     items.value = [...prefix, ...remote]
+    emit('update:modelValue',items.value[0]?.value)
   }
 
   onMounted(loadItems)
 
   watch(fetchParams, loadItems, { deep: true })
+
+
 </script>
 
 <style>

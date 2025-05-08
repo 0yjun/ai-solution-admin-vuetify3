@@ -1,14 +1,9 @@
 <template>
   <v-row row-gap="0">
-    <v-col class="pb-0 pt-0" sm="2">
+    <v-col class="border-e-thin" sm="2">
       {{ content.label }}
       <span v-if="content.color" style="color: red;">*</span>
     </v-col>
-
-    <v-divider
-      class="w-0"
-      vertical
-    />
 
     <v-col class="pb-0 pt-0" sm="10">
       <v-form ref="formRef">

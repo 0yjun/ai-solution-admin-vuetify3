@@ -64,7 +64,7 @@
   </v-container>
 </template>
 
-<script setup lang="ts">
+  <script setup lang="ts">
   import { computed, ref, watch } from 'vue'
   import type { MenuAdminDto } from '@/types/menu.dto'
   import Combo from '@/components/Combo.vue'
@@ -116,7 +116,7 @@
     menu => {
       if (menu && menu.id !== null) {
         console.log('선택된 메뉴:', menu)
-      // TODO: IndexInfo API 호출 등 추가 처리
+        // TODO: IndexInfo API 호출 등 추가 처리
       }
     }
   )
@@ -166,4 +166,4 @@
       alert(errorMessage)
     }
   }
-</script>
+  </script>

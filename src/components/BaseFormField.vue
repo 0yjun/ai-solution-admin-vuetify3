@@ -1,6 +1,7 @@
 <template>
   <v-row>
-    <v-col sm="2">{{ content.label }}
+    <v-col class="border-e-thin" sm="2">
+      {{ content.label }}
       <span
         v-if="content.color"
         style="color: red;"
@@ -8,11 +9,6 @@
         *
       </span>
     </v-col>
-
-    <v-divider
-      class="w-0"
-      vertical
-    />
 
     <v-col sm="10">
       <v-form ref="formRef">

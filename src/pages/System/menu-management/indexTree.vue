@@ -1,31 +1,28 @@
 <template>
-  <div>
-    <!-- 로딩 & 에러 표시 -->
-    <v-progress-circular v-if="loading" class="ma-auto" indeterminate size="24" />
-    <v-alert v-else-if="errorMsg" dense type="error">{{ errorMsg }}</v-alert>
+  <!-- 로딩 & 에러 표시 -->
+  <v-progress-circular v-if="loading" class="ma-auto" indeterminate size="24" />
+  <v-alert v-else-if="errorMsg" dense type="error">{{ errorMsg }}</v-alert>
 
-    <!-- 트리 뷰 -->
-    <v-treeview
-      v-else
-      v-model:activated="selectedItem"
-      activatable
-      item-key="id"
-      item-title="name"
-      :items="menuTree"
-      open-all
-      return-object
-    >
-      <template #prepend="{ item }">
-        <v-icon :icon="item.icon" />
-      </template>
-    </v-treeview>
-  </div>
+  <!-- 트리 뷰 -->
+  <v-treeview
+    v-else
+    v-model:activated="selectedItem"
+    activatable
+    item-key="id"
+    item-title="name"
+    :items="menuTree"
+    return-object
+  >
+    <template #prepend="{ item }">
+      <v-icon :icon="item.icon" />
+    </template>
+  </v-treeview>
 </template>
 
 <script setup lang="ts">
   import { defineEmits, defineExpose, ref, watch } from 'vue'
   import axios from 'axios'
-  import type { ApiResponse, MenuAdminDto } from '@/types/menu.dto'
+  import type { ApiResponse, MenuAdminDto } from '@/types'
 
   // emit 정의
   const emit = defineEmits<{

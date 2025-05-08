@@ -84,7 +84,6 @@
   import BaseFormCheckbox from '@/components/BaseFormCheckbox.vue'
   import type { FieldDef, MenuAdminDto } from '@/types';
   import BaseFormCombo from '@/components/BaseFormCombo.vue';
-  import { errorMessages } from 'vue/compiler-sfc';
 
   // 1) props 정의: 배열 또는 단일 객체 모두 받기
   const props = defineProps<{
