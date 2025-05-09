@@ -1,6 +1,7 @@
 <template>
   <v-footer
     app
+    class="border-t-thin"
     height="40"
   >
     <a

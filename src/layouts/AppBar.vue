@@ -5,8 +5,8 @@
     elevation="0"
     flat
     height="51"
-    title="AI Solution Management"
   >
+
     <template #prepend>
       <!-- 데스크탑: 미니 토글 -->
       <v-app-bar-nav-icon class="hidden-sm-and-down" @click="onDrawerMiniClick">
@@ -23,6 +23,15 @@
       </v-app-bar-nav-icon>
 
       <v-spacer />
+
+      <template
+        v-if="drawerMini"
+      >
+        <img
+          cover
+          src="/src/assets/aisolution_logo.png"
+        >
+      </template>
     </template>
 
     <template #append>
