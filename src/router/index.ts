@@ -14,9 +14,9 @@ import { useMenuStore } from '@/stores'
 
 // vue-router 플러그인을 사용한 디렉토리 기반 라우팅 설정
 //  • 기본적으로 모든 경로에 src/layouts/default.vue 레이아웃을 적용
-//  • '/login' 경로는 레이아웃을 비활성화
+//  • '/login' • '/Signup' 경로는 레이아웃을 비활성화
 const routes: RouteRecordRaw[] = autoRoutes.map(route => {
-  if (route.path.toLowerCase() === '/login') {
+  if (route.path.toLowerCase() === '/login' || route.path.toLowerCase() === '/signup') {
     return {
       ...route,
       meta: {
@@ -44,8 +44,12 @@ router.beforeEach(async (to,from)=>{
   }
 
   // 1) 인증 체크
-  if(!authStore.isAuthenticated && to.name !=='/Login/'){
-    return { name:'/Login/' }
+  // 공개 페이지 경로 목록
+  const publicPaths = ['/login', '/signup']
+
+  // 로그인 안 된 상태에서, /login, /signup 이외의 경로 접근 시 → /login으로 리다이렉트
+  if (!authStore.isAuthenticated && !publicPaths.includes(to.path.toLowerCase())) {
+    return { path: '/login' }
   }
 
   // 2) 로그인 후에도 메뉴가 로드되지 않았다면 재시도

@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import axios from 'axios'
 import type { ApiResponse, ApiResponseError, ApiResponseSuccess, LoginRequestDto, MemberDto } from '@/types'
 import { handleApiError } from '@/utils/errorHandler'
+import type { SignupRequestDto } from '@/types/signup-request.dto'
 
 
 export const useAuthStore = defineStore('auth', {
@@ -38,6 +39,33 @@ export const useAuthStore = defineStore('auth', {
 
       } catch (err: unknown) {
         return handleApiError(this,err,'로그인에 실패했습니다.')
+      } finally {
+        this.isLoading = false
+      }
+    },
+
+    /**
+     * 회원가입 시도
+     * @returns 성공하면 true, 실패하면 false
+     */
+    async signup (payload: SignupRequestDto): Promise<boolean> {
+      this.isLoading = true
+      this.errorMessage = ''
+
+      try {
+        const { data: resp } = await axios.post<
+          ApiResponseSuccess<MemberDto> | ApiResponseError
+        >('/api/auth/signup', payload, { withCredentials: true })
+
+        if (resp.code !== 'SUCCESS') {
+          this.errorMessage = resp.message
+          return false
+        }
+        return true
+
+      } catch (err: unknown) {
+        console.log(err)
+        return handleApiError(this, err, '회원가입에 실패했습니다.')
       } finally {
         this.isLoading = false
       }
