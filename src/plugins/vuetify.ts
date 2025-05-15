@@ -10,6 +10,7 @@ import 'vuetify/styles';
 import { VTreeview } from 'vuetify/labs/VTreeview'
 // Composables
 import { createVuetify } from 'vuetify';
+import colors from 'vuetify/util/colors'
 
 // https://vuetifyjs.com/en/introduction/why-vuetify/#feature-guides
 export default createVuetify({
@@ -18,5 +19,12 @@ export default createVuetify({
   },
   theme: {
     defaultTheme: 'light',
+    themes: {
+      light: {
+        colors: {
+          'table-header-color': colors.grey.lighten2,
+        },
+      },
+    },
   },
 });

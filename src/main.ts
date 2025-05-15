@@ -25,6 +25,7 @@ registerPlugins(app);
 
 // scss
 import '@/styles/global.scss'
+import '@/styles/table.scss'
 
 // 새로고침시 JWT로 세션 유지
 import { useAuthStore } from './stores';

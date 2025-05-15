@@ -1,0 +1,6 @@
+//v-data-table 오버라이드
+.v-data-table {
+    thead {
+        background: rgb(var(--v-theme-table-header-color)) !important;
+    }
+}  
