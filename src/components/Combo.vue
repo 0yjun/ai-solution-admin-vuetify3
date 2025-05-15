@@ -1,7 +1,7 @@
 <template>
   <v-select
     :class="{ 'text-required': required }"
-    dense
+    :density="density"
     :disabled="disabled"
     hide-details
     :item-title="'label'"
@@ -19,7 +19,8 @@
   import axios from 'axios'
   import { toRefs } from 'vue'
   import type { ApiResponse } from '@/types'
-  type comboItemType = Record<string, string>
+  import type { Density } from 'vuetify/lib/composables/density.mjs'
+  type comboItemType = Record<string, unknown>
 
   const props = defineProps({
     fetchUrl:    { type: String, default:'' },
@@ -30,6 +31,7 @@
     itemLabel:   { type: String, default: 'text' },
     required:    { type: Boolean, default: false },
     modelValue:  { required: false },
+    density:     { type: String as PropType<Density>, default: 'compact' }, // 'default' | 'comfortable' | 'compact'
     appendItems: { type: Array as PropType<comboItemType[]>, default: () => [] },
 
   })
