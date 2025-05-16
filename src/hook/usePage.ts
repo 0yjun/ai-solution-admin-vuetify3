@@ -1,25 +1,24 @@
 import { ref } from 'vue'
 import axios from 'axios'
-import type { ApiResponse } from '@/types'
+import type { ApiResponse, PaginatedResult } from '@/types'
 import { createEmptyPage } from '@/utils/initObjects'
-import type { PageType } from '@/types/page'
 import qs from 'qs'
-import type { PagingParams } from '@/types/pagingParams'
+import type { PagingParamsProps } from '@/types/common/paging-params.type'
 
 export function usePage<T> (fetchUrl: string,defaultSize = 10) {
-  const page = ref<PageType<T>>(createEmptyPage<T>(defaultSize))
+  const pagenation = ref<PaginatedResult<T>>(createEmptyPage<T>(defaultSize))
   const errorMessage = ref('')
 
-  async function fetchPage (params: PagingParams): Promise<boolean> {
+  async function fetchPage (params: PagingParamsProps): Promise<boolean> {
     errorMessage.value = ''
     try {
-      const { data: api } = await axios.get<ApiResponse<PageType<T>>>(fetchUrl, { params, paramsSerializer: p =>qs.stringify(p, { arrayFormat: 'repeat' }) })
+      const { data: api } = await axios.get<ApiResponse<PaginatedResult<T>>>(fetchUrl, { params, paramsSerializer: p =>qs.stringify(p, { arrayFormat: 'repeat' }) })
       if (api.code === 'SUCCESS' && api.data) {
-        page.value = api.data
+        pagenation.value = api.data
         return true
       } else {
         errorMessage.value = api.message
-        page.value = createEmptyPage<T>(defaultSize)
+        pagenation.value = createEmptyPage<T>(defaultSize)
         return false
       }
     } catch (err: unknown) {
@@ -30,15 +29,15 @@ export function usePage<T> (fetchUrl: string,defaultSize = 10) {
       } else {
         errorMessage.value = '알 수 없는 오류'
       }
-      page.value = createEmptyPage<T>(defaultSize)
+      pagenation.value = createEmptyPage<T>(defaultSize)
       return false
     }
   }
 
   function reset () {
-    page.value = createEmptyPage<T>(defaultSize)
+    pagenation.value = createEmptyPage<T>(defaultSize)
     errorMessage.value = ''
   }
 
-  return { page, fetchPage, reset, errorMessage }
+  return { pagenation, fetchPage, reset, errorMessage }
 }

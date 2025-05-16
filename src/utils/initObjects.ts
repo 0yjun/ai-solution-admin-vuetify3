@@ -1,4 +1,4 @@
-import type { Page, Pageable, Sort } from '@/types'
+import type { Pageable, PaginatedResult, Sort } from '@/types'
 
 // 공통으로 쓸 기본 Sort/Pageable 템플릿
 const defaultSort: Sort = { empty: true, sorted: false, unsorted: true }
@@ -14,7 +14,7 @@ const defaultPageable: Pageable = {
 /**
  * 빈 Page<T> 객체 생성기
  */
-export function createEmptyPage<T> (pageSize = 10): Page<T> {
+export function createEmptyPage<T> (pageSize = 10): PaginatedResult<T> {
   return {
     content: [],
     pageable: { ...defaultPageable, pageSize },

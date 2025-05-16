@@ -60,7 +60,7 @@
   import { storeToRefs } from 'pinia';
   import { useDrawerStore } from '@/stores/drawer';
   import { useMenuStore } from '@/stores';
-  import type { MenuClientDto } from '@/types/dtos/menu.dto';
+  import type { MenuClientDto } from '@/types/api/menu.dto';
 
   const drawerStore = useDrawerStore();
   const { drawerOpen, drawerMini } = storeToRefs(drawerStore);

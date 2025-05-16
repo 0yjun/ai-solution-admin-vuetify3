@@ -34,11 +34,11 @@
 
   <script setup lang="ts">
   import { computed, nextTick, onMounted, ref } from 'vue'
-  import type { FieldDef } from '@/types'
   import type { VForm, VTextField } from 'vuetify/components';
+  import type { BaseFormFieldProps } from '@/types/components/base-form-field.type';
 
   const props = defineProps<{
-    content: Omit<FieldDef, 'temp'>
+    content: Omit<BaseFormFieldProps, 'temp'>
     modelValue: string
   }>()
 

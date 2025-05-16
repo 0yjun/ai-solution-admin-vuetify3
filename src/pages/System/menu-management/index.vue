@@ -66,7 +66,7 @@
 
 <script setup lang="ts">
   import { computed, ref, watch } from 'vue'
-  import type { MenuAdminDto } from '@/types/dtos/menu.dto'
+  import type { MenuAdminDto } from '@/types/api/menu.dto'
   import Combo from '@/components/Combo.vue'
   import IndexTree from '@/pages/System/menu-management/indexTree.vue'
   import IndexInfo from '@/pages/System/menu-management/indexInfo.vue'
@@ -121,7 +121,7 @@
     }
   )
   // 메뉴 저장
-  async function saveMenu (payload: Record<string,string>) {
+  async function saveMenu (payload: Record<string,any>) {
     // 1) 메뉴가 선택되지 않았다면 중단
     if (!selectedMenu.value) {
       console.warn('저장할 메뉴가 선택되지 않았습니다.');

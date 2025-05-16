@@ -82,7 +82,7 @@
   import { computed, reactive, ref, watch } from 'vue'
   import BaseFormField from '@/components/BaseFormField.vue'
   import BaseFormCheckbox from '@/components/BaseFormCheckbox.vue'
-  import type { FieldDef, MenuAdminDto } from '@/types';
+  import type { BaseFormFieldProps, MenuAdminDto } from '@/types';
   import BaseFormCombo from '@/components/BaseFormCombo.vue';
 
   // 1) props 정의: 배열 또는 단일 객체 모두 받기
@@ -98,7 +98,7 @@
   )
 
   // 3) 폼 필드 메타데이터 (기존 defaultFields)
-  const defaultFields: Omit<FieldDef, 'text' | 'temp'>[] = [
+  const defaultFields: Omit<BaseFormFieldProps, 'text' | 'temp'>[] = [
     {
       key: 'name',
       name: '메뉴명',
@@ -275,7 +275,7 @@
   ]
 
   // 4) dto 값이 바뀔 때마다 fields 배열 재생성
-  const fields = reactive<FieldDef[]>([])
+  const fields = reactive<BaseFormFieldProps[]>([])
 
   watch(dto, newDto => {
     fields.splice(

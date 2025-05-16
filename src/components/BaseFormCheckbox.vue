@@ -35,13 +35,14 @@
   import { computed, onMounted, ref, watch } from 'vue'
   import axios from 'axios'
   import type { VCombobox, VForm } from 'vuetify/components'
-  import type { FieldDef } from '@/types'
+  import type { BaseFormFieldProps } from '@/types/components/base-form-field.type';
+
 
   type ComboItem = Record<string, any>
 
   // props 정의: content와 v-model, 그리고 선택적 fetchUrl, appendItems, itemLabel, itemValue
   const props = defineProps<{
-    content: Omit<FieldDef, 'temp'>
+    content: Omit<BaseFormFieldProps, 'temp'>
     modelValue: any[]
     fetchUrl?: string|null
     appendItems?: ComboItem[]
@@ -50,9 +51,7 @@
   }>()
 
   // v-model emit
-  const emit = defineEmits<{
-    (e: 'update:modelValue', v: any[]): void
-  }>()
+  const emit = defineEmits<{ (e: 'update:modelValue', v): void }>()
 
   // form, combo refs
   const formRef = ref<InstanceType<typeof VForm> | null>(null)

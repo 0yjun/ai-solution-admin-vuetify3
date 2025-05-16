@@ -1,6 +1,6 @@
 import type { ValidationRule } from 'vuetify'
 
-export interface FieldDef {
+export interface BaseFormFieldProps {
   key: string
   text: string
   temp: string

@@ -1,14 +1,14 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
-import type { ApiResponse, ApiResponseError, ApiResponseSuccess, LoginRequestDto, MemberDto } from '@/types'
+import type { ApiResponse, ApiResponseError, ApiResponseSuccess, LoginRequestDto, MemberClientDto } from '@/types'
 import { handleApiError } from '@/utils/errorHandler'
-import type { SignupRequestDto } from '@/types/signup-request.dto'
+import type { SignupRequestDto } from '@/types/api/signup-request.dto'
 
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     isAuthenticated: false as boolean,
-    user: null as MemberDto | null,
+    user: null as MemberClientDto | null,
     errorMessage: '' as string,
     isLoading: false as boolean, // ← 로그인 중 로딩 상태
   }),
@@ -23,7 +23,7 @@ export const useAuthStore = defineStore('auth', {
 
       try {
         const { data: resp } = await axios.post<
-          ApiResponseSuccess<MemberDto> | ApiResponseError
+          ApiResponseSuccess<MemberClientDto> | ApiResponseError
         >('/api/auth/login', credentials, { withCredentials: true })
 
         if (resp.code !== 'SUCCESS') {
@@ -54,7 +54,7 @@ export const useAuthStore = defineStore('auth', {
 
       try {
         const { data: resp } = await axios.post<
-          ApiResponseSuccess<MemberDto> | ApiResponseError
+          ApiResponseSuccess<MemberClientDto> | ApiResponseError
         >('/api/auth/signup', payload, { withCredentials: true })
 
         if (resp.code !== 'SUCCESS') {
@@ -101,7 +101,7 @@ export const useAuthStore = defineStore('auth', {
 
       try {
         // 1) JWT 쿠키가 있으면 자동 포함됨
-        const res = await axios.get<ApiResponse<MemberDto>>(
+        const res = await axios.get<ApiResponse<MemberClientDto>>(
           '/api/members/me',
           { withCredentials: true }
         )

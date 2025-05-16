@@ -1,4 +1,4 @@
-export interface PagingParams {
+export interface PagingParamsProps {
   page: number // 0-based
   size: number
   sort: string[] // ["role,asc","username,desc"] 형태

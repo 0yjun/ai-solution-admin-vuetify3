@@ -33,11 +33,11 @@
   import { onMounted, ref } from 'vue'
   import axios from 'axios'
   import type { VForm, VSelect } from 'vuetify/components'
-  import type { FieldDef } from '@/types'
+  import type { BaseFormFieldProps } from '@/types/components/base-form-field.type';
 
   // props 정의
   const props = defineProps<{
-    content: Omit<FieldDef, 'temp'>
+    content: Omit<BaseFormFieldProps, 'temp'>
     modelValue: any
   }>()
 

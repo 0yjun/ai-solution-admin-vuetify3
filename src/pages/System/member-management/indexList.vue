@@ -1,11 +1,11 @@
 <template>
   <v-data-table
-    density="compact"
+    density="comfortable"
     :headers="headers"
-    :items="page.content"
-    :items-per-page="page.size"
+    :items="pagenation.content"
+    :items-per-page="pagenation.size"
     multi-sort
-    :server-items-length="page.totalElements"
+    :server-items-length="pagenation.totalElements"
     :v-model:options="options"
     @update:options="onOptionsUpdate"
   >
@@ -21,14 +21,9 @@
 
 <script setup lang="ts">
   import type { MemberAdminDto } from '@/types';
-  import type { PageType } from '@/types/page';
+  import type { IndexListProps } from '@/types/common/index-list.type';
 
-  defineProps<{
-    page: PageType<MemberAdminDto>
-    options: object
-    headers: object[]
-    onOptionsUpdate: (value:any)=>any
-  }>()
+  defineProps<IndexListProps<MemberAdminDto>>()
 
 
 </script>
