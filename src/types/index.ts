@@ -6,6 +6,7 @@ export * from './api/menu.dto'
 
 // Common types
 export * from './common/api.type'
+export * from './common/data-table.type'
 export * from './common/index-list.type'
 export * from './common/page.type'
 export * from './common/paging-params.type'

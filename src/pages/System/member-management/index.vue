@@ -61,10 +61,11 @@
   <v-container fluid>
     <IndexList
       :headers="headers"
-      :on-options-update="onOptionsUpdate"
       :options="options"
-      :
-      :pagenation="pagenation"
+      :pagination="pagination"
+      @delete="onDelete"
+      @update="onUpdate"
+      @update:options="onOptionsUpdate"
     />
   </v-container>
 </template>
@@ -72,11 +73,11 @@
 <script setup lang="ts">
   import { reactive, ref } from 'vue'
   import Combo from '@/components/Combo.vue'
-  import type { MemberAdminDto, PaginationOptions } from '@/types'
+  import type { DataTableHeader, DataTableOptions, MemberAdminDto } from '@/types'
   import { usePage } from '@/hook/usePage'
   import IndexList from './indexList.vue'
 
-  const { pagenation, fetchPage } = usePage<MemberAdminDto>('/api/members', 10)
+  const { pagination, fetchPage } = usePage<MemberAdminDto>('/api/members', 10)
 
   // 초기 로드
   onMounted(() => {
@@ -92,17 +93,17 @@
 
   const selectedRole = ref<string | null>(null)
 
-  const options = ref<PaginationOptions>({
+  const options = ref<DataTableOptions>({
     page: 1,
     itemsPerPage: 10,
     sortBy: [{ key: 'role', order: 'asc' }, { key: 'username', order: 'asc' }],
   })
 
-  const headers = [
+  const headers:DataTableHeader[] = [
     { title: '유저명', sortable: true, value: 'username',width:'20%' },
     { title: '권한', sortable: true, value: 'role' , width:'30%' },
     { title: '설명', value: 'description' , width:'50%' },
-    { title: '', key: 'actions', align: 'end', sortable: false },
+    { title: '', value:'', key: 'actions', align: 'end', sortable: false },
   ]
 
   function onSearch () {
@@ -118,7 +119,8 @@
     })
   }
 
-  function onOptionsUpdate (newOpts: PaginationOptions) {
+  function onOptionsUpdate (newOpts: DataTableOptions) {
+    console.log(newOpts)
     // 1) page, itemsPerPage 만 바꾸고
     options.value.page = newOpts.page
     options.value.itemsPerPage = newOpts.itemsPerPage
@@ -128,5 +130,14 @@
       options.value.sortBy = newOpts.sortBy
     }
     onSearch()
+  }
+
+  function onUpdate (id: number | string) {
+    console.log('Update clicked, id =', id)
+  }
+
+  // 6) 삭제 버튼 클릭
+  function onDelete (id: number | string) {
+    console.log('Delete clicked, id =', id)
   }
 </script>

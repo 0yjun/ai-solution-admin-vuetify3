@@ -5,13 +5,6 @@ export interface Sort {
   unsorted: boolean
 }
 
-/** 페이징 요청 파라미터 */
-export interface PaginationOptions {
-  page: number
-  itemsPerPage: number
-  sortBy: SortBy[]
-}
-
 /** sortBy 한 건 */
 export interface SortBy {
   key: string

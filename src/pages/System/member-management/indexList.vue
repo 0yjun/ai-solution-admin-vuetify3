@@ -2,28 +2,45 @@
   <v-data-table
     density="comfortable"
     :headers="headers"
-    :items="pagenation.content"
-    :items-per-page="pagenation.size"
+    :items="pagination.content"
+    :items-per-page="pagination.size"
     multi-sort
-    :server-items-length="pagenation.totalElements"
-    :v-model:options="options"
-    @update:options="onOptionsUpdate"
+    :options="options"
+    :server-items-length="pagination.totalElements"
+    @update:options="opts => emit('update:options', opts)"
   >
     <template #item.actions="{ item }">
-      <div class="d-flex ga-2 justify-end">
-        <v-icon color="medium-emphasis" icon="mdi-pencil" size="small" @click="edit(item.id)" />
-        <v-icon color="medium-emphasis" icon="mdi-delete" size="small" @click="remove(item.id)" />
+      <div class="d-flex gap-2 justify-end">
+        <!-- 연필 아이콘: 수정 -->
+        <v-icon
+          class="cursor-pointer"
+          small
+          @click="emit('update', item.id)"
+        >
+          mdi-pencil
+        </v-icon>
+
+        <!-- 휴지통 아이콘: 삭제 -->
+        <v-icon
+          class="cursor-pointer"
+          small
+          @click="emit('delete', item.id)"
+        >
+          mdi-delete
+        </v-icon>
       </div>
     </template>
   </v-data-table>
 </template>
 
-
 <script setup lang="ts">
-  import type { MemberAdminDto } from '@/types';
-  import type { IndexListProps } from '@/types/common/index-list.type';
-
-  defineProps<IndexListProps<MemberAdminDto>>()
+  import type { DataTableOptions, IndexListProps } from '@/types';
 
 
+  const { pagination, options, headers } = defineProps<IndexListProps>()
+  const emit = defineEmits<{
+    (e: 'update:options', opts: DataTableOptions): void
+    (e: 'update', id: number | string): void
+    (e: 'delete', id: number | string): void
+  }>()
 </script>
