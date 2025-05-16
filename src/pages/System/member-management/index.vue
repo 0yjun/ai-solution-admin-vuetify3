@@ -73,15 +73,27 @@
 <script setup lang="ts">
   import { reactive, ref } from 'vue'
   import Combo from '@/components/Combo.vue'
-  import type { DataTableHeader, DataTableOptions, MemberAdminDto } from '@/types'
-  import { usePage } from '@/hook/usePage'
+  import type { DataTableHeader, MemberAdminDto } from '@/types'
+  import { usePage } from '@/hooks/usePage'
   import IndexList from './indexList.vue'
 
-  const { pagination, fetchPage } = usePage<MemberAdminDto>('/api/members', 10)
+  const { pagination, fetchPage, options, onOptionsUpdate } = usePage<MemberAdminDto>('/api/members', 10)
+
+  options.value = {
+    page: 2, // 4번째 페이지부터 시작
+    itemsPerPage: 20,
+    sortBy: [
+      { key: 'role', order: 'desc' }, // 기본 정렬
+      { key: 'username', order: 'asc' },
+    ],
+  }
 
   // 초기 로드
   onMounted(() => {
-    onSearch ()
+    fetchPage({
+      search: search.text,
+      role: selectedRole.value,
+    })
   })
 
   // 검색 폼 상태
@@ -93,12 +105,6 @@
 
   const selectedRole = ref<string | null>(null)
 
-  const options = ref<DataTableOptions>({
-    page: 1,
-    itemsPerPage: 10,
-    sortBy: [{ key: 'role', order: 'asc' }, { key: 'username', order: 'asc' }],
-  })
-
   const headers:DataTableHeader[] = [
     { title: '유저명', sortable: true, value: 'username',width:'20%' },
     { title: '권한', sortable: true, value: 'role' , width:'30%' },
@@ -107,29 +113,10 @@
   ]
 
   function onSearch () {
-    const sortArray = options.value.sortBy.map(({ key, order }) =>
-      `${key},${order}`
-    )
     fetchPage({
       search: search.text,
       role: selectedRole.value,
-      page: options.value.page - 1,
-      size: options.value.itemsPerPage,
-      sort:sortArray,
     })
-  }
-
-  function onOptionsUpdate (newOpts: DataTableOptions) {
-    console.log(newOpts)
-    // 1) page, itemsPerPage 만 바꾸고
-    options.value.page = newOpts.page
-    options.value.itemsPerPage = newOpts.itemsPerPage
-
-    // 2) sortBy: 유저가 직접 헤더 클릭으로 바꾼 경우에만 덮어쓰기
-    if (newOpts.sortBy.length) {
-      options.value.sortBy = newOpts.sortBy
-    }
-    onSearch()
   }
 
   function onUpdate (id: number | string) {
