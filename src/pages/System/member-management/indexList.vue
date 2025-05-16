@@ -1,17 +1,34 @@
 <template>
   <v-data-table
-    dense
+    density="compact"
     :headers="headers"
-    :items="contents"
-  />
+    :items="page.content"
+    :items-per-page="page.size"
+    multi-sort
+    :server-items-length="page.totalElements"
+    :v-model:options="options"
+    @update:options="onOptionsUpdate"
+  >
+    <template #item.actions="{ item }">
+      <div class="d-flex ga-2 justify-end">
+        <v-icon color="medium-emphasis" icon="mdi-pencil" size="small" @click="edit(item.id)" />
+        <v-icon color="medium-emphasis" icon="mdi-delete" size="small" @click="remove(item.id)" />
+      </div>
+    </template>
+  </v-data-table>
 </template>
 
 
 <script setup lang="ts">
   import type { MemberDto } from '@/types';
+  import type { Page } from '@/types/page';
 
   defineProps<{
+    page: Page<MemberDto>
+    options: object
     headers: object[]
-    contents: MemberDto[]
+    onOptionsUpdate: (value:any)=>any
   }>()
+
+
 </script>

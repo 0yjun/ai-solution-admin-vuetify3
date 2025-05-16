@@ -21,6 +21,7 @@ declare module 'vue' {
     Component: typeof import('./src/components/Component.vue')['default']
     copy: typeof import('./src/components/BaseFormField copy.vue')['default']
     DashBoard: typeof import('./src/components/DashBoard.vue')['default']
+    DataTable: typeof import('./src/components/DataTable.vue')['default']
     Default: typeof import('./src/layouts/default.vue')['default']
     GlobalCOmboBox: typeof import('./src/components/GlobalCOmboBox.vue')['default']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']

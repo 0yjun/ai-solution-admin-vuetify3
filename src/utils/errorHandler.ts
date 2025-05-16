@@ -2,10 +2,7 @@ import type { ApiResponseError } from '@/types'
 import axios from 'axios'
 
 export function handleApiError (
-  store: { $reset(): void, errorMessage: string },
-  err: unknown,
-  defaultMsg: string
-):boolean{
+  store: { $reset(): void, errorMessage: string },err: unknown,defaultMsg: string):boolean{
   let msg = defaultMsg
   if(axios.isAxiosError<ApiResponseError>(err) && err.response){
     msg = err.response.data.message
