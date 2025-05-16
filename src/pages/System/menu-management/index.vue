@@ -66,7 +66,7 @@
 
 <script setup lang="ts">
   import { computed, ref, watch } from 'vue'
-  import type { MenuAdminDto } from '@/types/menu.dto'
+  import type { MenuAdminDto } from '@/types/dtos/menu.dto'
   import Combo from '@/components/Combo.vue'
   import IndexTree from '@/pages/System/menu-management/indexTree.vue'
   import IndexInfo from '@/pages/System/menu-management/indexInfo.vue'

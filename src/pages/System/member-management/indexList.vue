@@ -20,11 +20,11 @@
 
 
 <script setup lang="ts">
-  import type { MemberDto } from '@/types';
-  import type { Page } from '@/types/page';
+  import type { MemberAdminDto } from '@/types';
+  import type { PageType } from '@/types/page';
 
   defineProps<{
-    page: Page<MemberDto>
+    page: PageType<MemberAdminDto>
     options: object
     headers: object[]
     onOptionsUpdate: (value:any)=>any

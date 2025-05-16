@@ -1,34 +1,34 @@
 // 페이징 응답용 제네릭 타입
-export interface Sort {
+export interface SortType {
   empty: boolean
   sorted: boolean
   unsorted: boolean
 }
 
-export interface Pageable {
+export interface PageableType {
   pageNumber: number
   pageSize: number
-  sort: Sort
+  sort: SortType
   offset: number
   paged: boolean
   unpaged: boolean
 }
 
-export interface PageOptions{
+export interface PageOptionsType{
   page: number
   itemsPerPage: number,
   sortBy: { key:string , order: 'desc'|'asc' }[] | []
 }
 
-export interface Page<T> {
+export interface PageType<T> {
   content: T[]
-  pageable: Pageable
+  pageable: PageableType
   last: boolean
   totalPages: number
   totalElements: number
   size: number
   number: number
-  sort: Sort
+  sort: SortType
   first: boolean
   numberOfElements: number
   empty: boolean

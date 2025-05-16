@@ -71,12 +71,12 @@
 <script setup lang="ts">
   import { reactive, ref } from 'vue'
   import Combo from '@/components/Combo.vue'
-  import type { MemberDto } from '@/types'
+  import type { MemberAdminDto } from '@/types'
   import { usePage } from '@/hook/usePage'
   import IndexList from './indexList.vue'
-  import type { PageOptions } from '@/types/page'
+  import type { PageOptionsType } from '@/types/page'
 
-  const { page, fetchPage } = usePage<MemberDto>('/api/members', 10)
+  const { page, fetchPage } = usePage<MemberAdminDto>('/api/members', 10)
 
   // 초기 로드
   onMounted(() => {
@@ -92,7 +92,7 @@
 
   const selectedRole = ref<string | null>(null)
 
-  const options = ref<PageOptions>({
+  const options = ref<PageOptionsType>({
     page: 1,
     itemsPerPage: 10,
     sortBy: [{ key: 'role', order: 'asc' }, { key: 'username', order: 'asc' }],
@@ -118,7 +118,7 @@
     })
   }
 
-  function onOptionsUpdate (newOpts: PageOptions) {
+  function onOptionsUpdate (newOpts: PageOptionsType) {
     // 1) page, itemsPerPage 만 바꾸고
     options.value.page = newOpts.page
     options.value.itemsPerPage = newOpts.itemsPerPage
