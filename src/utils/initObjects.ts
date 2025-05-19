@@ -1,4 +1,4 @@
-import type { Pageable, PaginatedResult, Sort } from '@/types'
+import type { MemberAdminDto, Pageable, PaginatedResult, Sort } from '@/types'
 
 // 공통으로 쓸 기본 Sort/Pageable 템플릿
 const defaultSort: Sort = { empty: true, sorted: false, unsorted: true }
@@ -27,5 +27,14 @@ export function createEmptyPage<T> (pageSize = 10): PaginatedResult<T> {
     first: true,
     numberOfElements: 0,
     empty: true,
+  }
+}
+
+export function createEmptyMemberAdminDto ():MemberAdminDto{
+  return {
+    id: null,
+    description:'',
+    role: '',
+    username: '',
   }
 }

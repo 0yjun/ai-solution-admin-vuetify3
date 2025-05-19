@@ -4,7 +4,7 @@ export interface MemberClientDto {
 }
 
 export interface MemberAdminDto {
-  id: number
+  id: number | null
   username: string
   role: string
   description: string

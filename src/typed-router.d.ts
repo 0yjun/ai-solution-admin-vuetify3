@@ -25,6 +25,7 @@ declare module 'vue-router/auto-routes' {
     '/System/help-dialog/': RouteRecordInfo<'/System/help-dialog/', '/System/help-dialog', Record<never, never>, Record<never, never>>,
     '/System/member-management/': RouteRecordInfo<'/System/member-management/', '/System/member-management', Record<never, never>, Record<never, never>>,
     '/System/member-management/indexList': RouteRecordInfo<'/System/member-management/indexList', '/System/member-management/indexList', Record<never, never>, Record<never, never>>,
+    '/System/member-management/popupUpdate': RouteRecordInfo<'/System/member-management/popupUpdate', '/System/member-management/popupUpdate', Record<never, never>, Record<never, never>>,
     '/System/menu-management/': RouteRecordInfo<'/System/menu-management/', '/System/menu-management', Record<never, never>, Record<never, never>>,
     '/System/menu-management/indexInfo': RouteRecordInfo<'/System/menu-management/indexInfo', '/System/menu-management/indexInfo', Record<never, never>, Record<never, never>>,
     '/System/menu-management/indexTree': RouteRecordInfo<'/System/menu-management/indexTree', '/System/menu-management/indexTree', Record<never, never>, Record<never, never>>,

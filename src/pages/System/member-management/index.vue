@@ -64,8 +64,14 @@
       :options="options"
       :pagination="pagination"
       @delete="onDelete"
-      @update="onUpdate"
+      @update="onUpdateClick"
       @update:options="onOptionsUpdate"
+    />
+
+    <PopupUpdate
+      v-model:dialog="editDialog"
+      :model="editModel"
+      @update="onUpdate"
     />
   </v-container>
 </template>
@@ -76,8 +82,15 @@
   import type { DataTableHeader, MemberAdminDto } from '@/types'
   import { usePage } from '@/hooks/usePage'
   import IndexList from './indexList.vue'
+  import { useDelete } from '@/hooks/useDelete'
+  import PopupUpdate from './popupUpdate.vue'
+  import { createEmptyMemberAdminDto } from '@/utils/initObjects'
 
   const { pagination, fetchPage, options, onOptionsUpdate } = usePage<MemberAdminDto>('/api/members', 10)
+  const { mutate:deleteMember, isSuccess:isDeleting, errorMessage: deleteError } = useDelete('/api/members')
+
+  const editModel = ref<MemberAdminDto>(createEmptyMemberAdminDto())
+  const editDialog = ref(false)
 
   options.value = {
     page: 2, // 4번째 페이지부터 시작
@@ -119,12 +132,27 @@
     })
   }
 
-  function onUpdate (id: number | string) {
-    console.log('Update clicked, id =', id)
+  function onUpdateClick (item: MemberAdminDto) {
+    editDialog.value=true
+    editModel.value = item
+  }
+
+  function onUpdate (item: MemberAdminDto) {
+    console.log(item)
+    editDialog.value=true
+    editModel.value = item
   }
 
   // 6) 삭제 버튼 클릭
-  function onDelete (id: number | string) {
+  async function onDelete (id: number | string) {
+    await deleteMember(id);
+    if(!isDeleting){
+      console.error(deleteError)
+    }
+    await fetchPage({
+      search: search.text,
+      role: selectedRole.value,
+    })
     console.log('Delete clicked, id =', id)
   }
 </script>

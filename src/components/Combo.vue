@@ -3,7 +3,7 @@
     :class="{ 'text-required': required }"
     :density="density"
     :disabled="disabled"
-    hide-details
+    :hide-details="hideDetail"
     :item-title="'label'"
     :item-value="'value'"
     :items="items"
@@ -26,6 +26,7 @@
     fetchUrl:    { type: String, default:'' },
     fetchParams: { type: Object, default: () => ({}) },
     disabled:    { type: Boolean, default: false },
+    hideDetail:  { type: Boolean, default: false },
     label:       { type: String, default: '' },
     itemValue:   { type: String, default: 'value' },
     itemLabel:   { type: String, default: 'text' },

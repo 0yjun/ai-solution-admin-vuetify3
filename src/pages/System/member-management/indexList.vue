@@ -15,7 +15,7 @@
         <v-icon
           class="cursor-pointer"
           small
-          @click="emit('update', item.id)"
+          @click="emit('update', item)"
         >
           mdi-pencil
         </v-icon>
@@ -34,13 +34,13 @@
 </template>
 
 <script setup lang="ts">
-  import type { DataTableOptions, IndexListProps } from '@/types';
+  import type { DataTableOptions, IndexListProps, MemberAdminDto } from '@/types';
 
 
   const { pagination, options, headers } = defineProps<IndexListProps>()
   const emit = defineEmits<{
     (e: 'update:options', opts: DataTableOptions): void
-    (e: 'update', id: number | string): void
+    (e: 'update', item: MemberAdminDto): void
     (e: 'delete', id: number | string): void
   }>()
 </script>
