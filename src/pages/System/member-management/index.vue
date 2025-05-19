@@ -51,7 +51,7 @@
   >
     <v-row>
       <v-col class="d-flex justify-end">
-        <v-btn color="primary" @click="onSearch">
+        <v-btn color="primary" @click="onCreateClcik">
           생성
         </v-btn>
       </v-col>
@@ -64,7 +64,8 @@
       :options="options"
       :pagination="pagination"
       @delete="onDelete"
-      @update="onUpdateClick"
+      @popup:reset-password="onResetPasswordClick"
+      @popup:update="onUpdateClick"
       @update:options="onOptionsUpdate"
     />
 
@@ -72,6 +73,18 @@
       v-model:dialog="editDialog"
       :model="editModel"
       @update="onUpdate"
+    />
+
+    <PopupResetPassword
+      v-model:dialog="resetPwDialog"
+      :model="resetPwModel"
+      @update="onResetPassword"
+    />
+
+    <PopupCreate
+      v-model:dialog="createDialog"
+      :model="createModel"
+      @update="onCreate"
     />
   </v-container>
 </template>
@@ -85,16 +98,29 @@
   import { useDelete } from '@/hooks/useDelete'
   import PopupUpdate from './popupUpdate.vue'
   import { createEmptyMemberAdminDto } from '@/utils/initObjects'
+  import { useUpdate } from '@/hooks/useUpdate'
+  import { useCreate } from '@/hooks/useCreate'
+  import PopupCreate from './popupCreate.vue'
+  import PopupResetPassword from './popupResetPassword.vue'
 
   const { pagination, fetchPage, options, onOptionsUpdate } = usePage<MemberAdminDto>('/api/members', 10)
   const { mutate:deleteMember, isSuccess:isDeleting, errorMessage: deleteError } = useDelete('/api/members')
+  const { mutate:updateMember, isSuccess:isUpdating, errorMessage: updateError } = useUpdate('/api/members')
+  const { mutate:resetPasswordMember, isSuccess:isPwChanging, errorMessage: pwError } = useUpdate('/api/members')
+  const { mutate:createMember, isSuccess:isCreating, errorMessage: createError } = useCreate('/api/members')
 
   const editModel = ref<MemberAdminDto>(createEmptyMemberAdminDto())
   const editDialog = ref(false)
 
+  const resetPwModel = ref<MemberAdminDto>(createEmptyMemberAdminDto())
+  const resetPwDialog = ref(false)
+
+  const createModel = ref<MemberAdminDto>(createEmptyMemberAdminDto())
+  const createDialog = ref(false)
+
   options.value = {
-    page: 2, // 4번째 페이지부터 시작
-    itemsPerPage: 20,
+    page: 1,
+    itemsPerPage: 10,
     sortBy: [
       { key: 'role', order: 'desc' }, // 기본 정렬
       { key: 'username', order: 'asc' },
@@ -137,13 +163,55 @@
     editModel.value = item
   }
 
-  function onUpdate (item: MemberAdminDto) {
-    console.log(item)
-    editDialog.value=true
-    editModel.value = item
+  function onResetPasswordClick (item: MemberAdminDto) {
+    resetPwDialog.value=true
+    resetPwModel.value = item
   }
 
-  // 6) 삭제 버튼 클릭
+  function onCreateClcik () {
+    createDialog.value=true
+    createModel.value = createEmptyMemberAdminDto()
+  }
+
+  async function onUpdate (item: MemberAdminDto) {
+    if( typeof item.id?.toString() !== 'string'){
+      return
+    }
+    await updateMember(item?.id?.toString(), item)
+    if(!isUpdating){
+      console.error(updateError)
+    }
+    await fetchPage({
+      search: search.text,
+      role: selectedRole.value,
+    })
+  }
+
+  async function onResetPassword (item: MemberAdminDto) {
+    if( typeof item.id?.toString() !== 'string'){
+      return
+    }
+    await resetPasswordMember(`${item.id}/password/reset`, item)
+    if(!isPwChanging){
+      console.error(pwError)
+    }
+    await fetchPage({
+      search: search.text,
+      role: selectedRole.value,
+    })
+  }
+
+  async function onCreate (item: MemberAdminDto) {
+    await createMember(item)
+    if(!isCreating){
+      console.error(createError)
+    }
+    await fetchPage({
+      search: search.text,
+      role: selectedRole.value,
+    })
+  }
+
   async function onDelete (id: number | string) {
     await deleteMember(id);
     if(!isDeleting){
@@ -153,6 +221,5 @@
       search: search.text,
       role: selectedRole.value,
     })
-    console.log('Delete clicked, id =', id)
   }
 </script>

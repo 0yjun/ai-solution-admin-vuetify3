@@ -15,7 +15,15 @@
         <v-icon
           class="cursor-pointer"
           small
-          @click="emit('update', item)"
+          @click="emit('popup:reset-password', item)"
+        >
+          mdi-pencil
+        </v-icon>
+
+        <v-icon
+          class="cursor-pointer"
+          small
+          @click="emit('popup:update', item)"
         >
           mdi-pencil
         </v-icon>
@@ -40,7 +48,8 @@
   const { pagination, options, headers } = defineProps<IndexListProps>()
   const emit = defineEmits<{
     (e: 'update:options', opts: DataTableOptions): void
-    (e: 'update', item: MemberAdminDto): void
+    (e: 'popup:update', item: MemberAdminDto): void
+    (e: 'popup:reset-password', item: MemberAdminDto): void
     (e: 'delete', id: number | string): void
   }>()
 </script>

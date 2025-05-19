@@ -10,10 +10,7 @@ export function useDelete (baseUrl: string) {
      * @param id        삭제 대상 리소스의 ID
      * @param params    DELETE 시 전달할 추가 쿼리 파라미터들 (cascade, force, soft, etc.)
      */
-  async function mutate (
-    id: string | number,
-    params: Record<string, any> = {}
-  ): Promise<boolean> {
+  async function mutate (id: string | number, params: Record<string, any> = {}): Promise<boolean> {
     isLoading.value = true
     isSuccess.value = false
     errorMessage.value = ''

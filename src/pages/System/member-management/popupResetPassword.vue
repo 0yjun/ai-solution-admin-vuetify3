@@ -32,17 +32,6 @@
                 :placeholder="f.placeholder"
                 :rules="f.rule"
               />
-
-              <Combo
-                v-else-if="f.type ==='combo'"
-                ref="roleRef"
-                v-model="proxyModel.value[f.key]"
-                fetch-url="/api/constants/roles"
-                :item-label="f.itemLabel"
-                :item-value="f.itemValue"
-                :label="f.label"
-                :rules="f.rule"
-              />
             </template>
           </v-card-text>
 
@@ -94,36 +83,24 @@
         (v: string) => !(v && v.length > 20) || '유저아이디는 20자 이상 입력할 수 없습니다.',
       ],
     },
+
     {
-      key: 'role',
-      name: 'role',
-      label: '유저권한',
-      placeholder: '유저권한을 입력하세요.',
-      disabled: false,
-      maxlength: null,
-      counter: false,
-      type: 'combo',
-      autofocus: false,
-      color: true,
-      fetchUrl: '/api/constants/roles',
-      itemLabel:'label',
-      itemValue:'value',
-      message: '유저권한을 확인해주세요.',
-      rule: [(v: string) => v?.length!==0 || '유저권한은 필수입니다.'],
-    },
-    {
-      key: 'description',
-      name: 'description',
-      label: '설명',
-      placeholder: '설명을 입력하세요.',
+      key: 'password',
+      name: 'password',
+      label: '비밀번호',
+      placeholder: '비밀번호를 입력하세요.',
       disabled: false,
       maxlength: 20,
       counter: true,
       type: 'text',
       autofocus: true,
-      color: false,
-      message: '설명을 확인해주세요.',
-      rule: [],
+      color: true,
+      message: '비밀번호를 확인해주세요.',
+      rule: [
+        (v: string) => !!v || '비밀번호는 필수 입력사항입니다.',
+        (v: string) => !(v && v.length > 20) || '비밀번호는 20자 이상 입력할 수 없습니다.',
+      ],
     },
+
   ]
 </script>
