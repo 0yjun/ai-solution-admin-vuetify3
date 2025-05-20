@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 import axios, { type AxiosRequestConfig } from 'axios'
 
-type Params = Record<string, any>
+type Params = Record<string, unknown>
 
 type FetchOptions = {
   /** 추가할 쿼리 파라미터 */
@@ -16,7 +16,7 @@ export function useSearch<T> (
   fetchUrl: string,
   defaultParams: Params = {}
 ) {
-  const data = ref<T | T[] | null>(null)
+  const data = ref<T>()
   const isLoading = ref(false)
   const isSuccess = ref(false)
   const errorMessage = ref('')

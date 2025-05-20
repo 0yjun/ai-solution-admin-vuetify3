@@ -68,12 +68,13 @@
   import { useSearch } from '@/hooks/useSearch'
   import IndexTree from '@/pages/System/menu-management/indexTree.vue'
   import IndexInfo from '@/pages/System/menu-management/indexInfo.vue'
+  import type { MenuAdminDto } from '@/types'
   /**
    * 01. ref 선언
    */
   const isCreating = ref(false)
   const selectedRole = ref<string>('all')
-  const selectedMenuId = ref<string | number | null>(null)
+  const selectedMenuId = ref< number | null>(null)
 
   /**
    * 02. computed 선언
@@ -81,11 +82,13 @@
   const iconName = computed(() => isCreating.value ? 'mdi-minus' : 'mdi-plus')
   const buttonLabel= computed(() => isCreating.value ? '취소' : '생성')
 
+
   /**
    * 03. CRUD hook 선언
    */
   // 메뉴트리 조회
   const { data:treemodel, fetch:treeSearch } = useSearch<MenuAdminDto[]>('/api/menus');
+
   // 개별 메뉴 조회
   const { data: menuDetail ,fetch: fetchMenuDetail } = useSearch<MenuAdminDto>('/api/menus')
   /**
@@ -100,19 +103,46 @@
   })
 
   watch(selectedMenuId, menuId => {
-    console.log(menuId)
-    loadMenuDetail(menuId)
+    if(menuId == -1){
+      menuDetail.value=treemodel.value?.find(item=>item.id===-1)
+      return
+    }
+    loadMenuDetail(menuId || '')
   })
 
   async function loadTree (role: string) {
-    await treeSearch({ pathVariable: role })
+    await treeSearch({ params: { role } })
   }
 
-  async function loadMenuDetail (menuId: number) {
-    await fetchMenuDetail({ pathVariable: menuId })
+  async function loadMenuDetail (menuId: string|number) {
+    await fetchMenuDetail({ pathVariable: menuId || '' })
   }
 
-  function toggleCreating (){}
-
-
+  function toggleCreating (){
+    isCreating.value = !isCreating.value
+    if(!isCreating.value){
+      treemodel.value = treemodel.value?.filter(item=>item.id!==-1)
+      return
+    }
+    const placeholder: MenuAdminDto = {
+      id: -1,
+      name: '새 메뉴',
+      description: '',
+      url: '',
+      seq: 0,
+      icon: '',
+      active: false,
+      parentId: null,
+      children: [],
+      roles: [],
+      prevMenuId: null,
+      prevMenuUrl: null,
+      prevMenuName: null,
+      nextMenuId: null,
+      nextMenuUrl: null,
+      nextMenuName: null,
+    }
+    treemodel.value?.unshift(placeholder)
+    selectedMenuId.value = placeholder.id
+  }
 </script>
