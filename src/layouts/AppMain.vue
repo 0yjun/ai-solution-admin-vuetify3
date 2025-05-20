@@ -9,5 +9,3 @@
   import AppBreadcrumbs from './AppBreadcrumbs.vue';
 
 </script>
-
-<style scoped lang="sass"></style>

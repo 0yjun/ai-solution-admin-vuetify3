@@ -27,8 +27,39 @@ registerPlugins(app);
 import '@/styles/global.scss'
 import '@/styles/table.scss'
 
+// Axios 인터셉터 설정
+const loadingStore = useLoadingStore()
+
+axios.interceptors.request.use(config => {
+  const method = config.method?.toLowerCase()
+  if (method === 'post' || method === 'put' || method === 'delete') {
+    loadingStore.setLoading(true)
+  }
+  return config
+})
+
+axios.interceptors.response.use(
+  response => {
+    const method = response.config.method?.toLowerCase()
+    if (method === 'post' || method === 'put' || method === 'delete') {
+      loadingStore.setLoading(false)
+    }
+    return response
+  },
+  error => {
+    const method = error.config?.method?.toLowerCase()
+    if (method === 'post' || method === 'put' || method === 'delete') {
+      loadingStore.setLoading(false)
+    }
+    return Promise.reject(error)
+  }
+)
+
+
 // 새로고침시 JWT로 세션 유지
 import { useAuthStore } from './stores';
+import axios from 'axios';
+import { useLoadingStore } from './stores/loading';
 const authStore = useAuthStore()
 if(!authStore.isAuthenticated){
   try {
