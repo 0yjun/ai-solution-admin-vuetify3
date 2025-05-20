@@ -1,38 +1,53 @@
-import type { AxiosRequestConfig } from 'axios'
-import axios from 'axios'
+import { ref } from 'vue'
+import axios, { type AxiosRequestConfig } from 'axios'
 
-/**
- * useSearch 훅
- * @param fetchUrl - 조회할 엔드포인트 URL
- * @param defaultParams - 초기 요청 파라미터 객체
- * @returns data, isLoading, isSuccess, errorMessage, fetch
- */
-export function useSearch<T> (fetchUrl: string, defaultParams: Record<string, any> = {}) {
+type Params = Record<string, any>
+
+type FetchOptions = {
+  /** 추가할 쿼리 파라미터 */
+  params?: Params
+  /** URL 뒤에 붙일 path variable */
+  pathVariable?: string | number
+  /** axios 요청 설정 */
+  config?: AxiosRequestConfig
+}
+
+export function useSearch<T> (
+  fetchUrl: string,
+  defaultParams: Params = {}
+) {
   const data = ref<T | T[] | null>(null)
   const isLoading = ref(false)
   const isSuccess = ref(false)
   const errorMessage = ref('')
 
   /**
-     * 데이터 조회
-     * @param extraParams - fetch 호출 시 추가할 파라미터
-     * @param config - axios 요청 설정
-     * @returns Promise<boolean> - 호출 성공 여부
-     */
+   * 데이터 조회
+   * @param options.params - 추가 쿼리 파라미터
+   * @param options.pathVariable - URL 뒤에 붙일 path variable
+   * @param options.config - axios 요청 설정
+   */
   async function fetch (
-    extraParams: Record<string, any> = {},
-    config: AxiosRequestConfig = {}
+    { params = {}, pathVariable, config = {} }: FetchOptions = {}
   ): Promise<boolean> {
     isLoading.value = true
     isSuccess.value = false
     errorMessage.value = ''
 
+    // URL 구성
+    const url = pathVariable != null
+      ? `${fetchUrl}/${pathVariable}`
+      : fetchUrl
+
+    // 쿼리 파라미터 병합
+    const mergedParams: Params = { ...defaultParams, ...params }
+
     try {
-      const { data: resp } = await axios.get<T | T[]>(fetchUrl, {
-        params: { ...defaultParams, ...extraParams },
+      const response = await axios.get<T | T[]>(url, {
+        params: mergedParams,
         ...config,
       })
-      data.value = resp
+      data.value = response.data.data as T | T[]
       isSuccess.value = true
       return true
     } catch (err: unknown) {

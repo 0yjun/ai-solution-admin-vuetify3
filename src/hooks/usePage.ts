@@ -4,7 +4,6 @@ import qs from 'qs'
 import type {
   DataTableOptions,
   PaginatedResult,
-  PagingParamsProps,
   SortBy,
 } from './usePage.types'
 import type { ApiResponse } from '@/types/common/api.type'
@@ -45,7 +44,7 @@ export function usePage<T> (fetchUrl: string, defaultSize = 10) {
   const isSuccess = ref(false)
   const isLoading = ref(false)
 
-  async function fetchPage (extra: Record<string, any> = {}): Promise<boolean> {
+  async function fetchPage (extra: Record<string, string|number|object|null> = {}): Promise<boolean> {
     isLoading.value = true
     errorMessage.value = ''
 

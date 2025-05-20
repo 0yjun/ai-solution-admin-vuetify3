@@ -1,8 +1,9 @@
 <template>
-  <v-data-table
+  <v-data-table-server
     density="comfortable"
     :headers="headers"
     :items="pagination.content"
+    :items-length="pagination.totalElements"
     :items-per-page="pagination.size"
     multi-sort
     :options="options"
@@ -17,7 +18,7 @@
           small
           @click="emit('popup:reset-password', item)"
         >
-          mdi-pencil
+          mdi-key-change
         </v-icon>
 
         <v-icon
@@ -38,7 +39,7 @@
         </v-icon>
       </div>
     </template>
-  </v-data-table>
+  </v-data-table-server>
 </template>
 
 <script setup lang="ts">

@@ -31,5 +31,8 @@ declare module 'vue-router/auto-routes' {
     '/System/menu-management/': RouteRecordInfo<'/System/menu-management/', '/System/menu-management', Record<never, never>, Record<never, never>>,
     '/System/menu-management/indexInfo': RouteRecordInfo<'/System/menu-management/indexInfo', '/System/menu-management/indexInfo', Record<never, never>, Record<never, never>>,
     '/System/menu-management/indexTree': RouteRecordInfo<'/System/menu-management/indexTree', '/System/menu-management/indexTree', Record<never, never>, Record<never, never>>,
+    '/System/menu-management-returnobject/': RouteRecordInfo<'/System/menu-management-returnobject/', '/System/menu-management-returnobject', Record<never, never>, Record<never, never>>,
+    '/System/menu-management-returnobject/indexInfo': RouteRecordInfo<'/System/menu-management-returnobject/indexInfo', '/System/menu-management-returnobject/indexInfo', Record<never, never>, Record<never, never>>,
+    '/System/menu-management-returnobject/indexTree': RouteRecordInfo<'/System/menu-management-returnobject/indexTree', '/System/menu-management-returnobject/indexTree', Record<never, never>, Record<never, never>>,
   }
 }

@@ -151,7 +151,7 @@
     { title: '', value:'', key: 'actions', align: 'end', sortable: false },
   ]
 
-  function onSearch () {
+  async function onSearch () {
     fetchPage({
       search: search.text,
       role: selectedRole.value,
@@ -181,10 +181,7 @@
     if(!isUpdating){
       console.error(updateError)
     }
-    await fetchPage({
-      search: search.text,
-      role: selectedRole.value,
-    })
+    await onSearch();
   }
 
   async function onResetPassword (item: MemberAdminDto) {
@@ -195,10 +192,7 @@
     if(!isPwChanging){
       console.error(pwError)
     }
-    await fetchPage({
-      search: search.text,
-      role: selectedRole.value,
-    })
+    await onSearch();
   }
 
   async function onCreate (item: MemberAdminDto) {
@@ -206,10 +200,7 @@
     if(!isCreating){
       console.error(createError)
     }
-    await fetchPage({
-      search: search.text,
-      role: selectedRole.value,
-    })
+    await onSearch();
   }
 
   async function onDelete (id: number | string) {
@@ -217,9 +208,6 @@
     if(!isDeleting){
       console.error(deleteError)
     }
-    await fetchPage({
-      search: search.text,
-      role: selectedRole.value,
-    })
+    await onSearch();
   }
 </script>

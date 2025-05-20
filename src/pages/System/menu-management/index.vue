@@ -44,8 +44,8 @@
 
           <!-- 메뉴 트리 (로딩/에러/Tree 뷰 내부 처리) -->
           <IndexTree
-            ref="treeRef"
-            v-model="selectedMenu"
+            v-model="selectedMenuId"
+            :menu-tree="treemodel || []"
             style="height: 670px;"
           />
           <v-divider />
@@ -55,8 +55,8 @@
       <!-- 상세 정보 -->
       <v-col cols="9">
         <IndexInfo
-          v-if="Array.isArray(selectedMenu) && selectedMenu.length>0"
-          :contents="selectedMenu"
+          v-if="menuDetail"
+          :contents="menuDetail"
           @save="saveMenu"
         />
       </v-col>
@@ -65,105 +65,54 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, ref, watch } from 'vue'
-  import type { MenuAdminDto } from '@/types/api/menu.dto'
-  import Combo from '@/components/Combo.vue'
+  import { useSearch } from '@/hooks/useSearch'
   import IndexTree from '@/pages/System/menu-management/indexTree.vue'
   import IndexInfo from '@/pages/System/menu-management/indexInfo.vue'
-  import type { ApiResponse, ApiResponseError } from '@/types'
-  import axios from 'axios'
-
-  // 상태
+  /**
+   * 01. ref 선언
+   */
   const isCreating = ref(false)
-  const selectedRole = ref<string>('')
-  const selectedMenu = ref<MenuAdminDto | null>(null)
-  const treeRef = ref<InstanceType<typeof IndexTree>>()
-  const roleRef = ref<InstanceType<typeof Combo>>()
-  // 토글 버튼 UI
+  const selectedRole = ref<string>('all')
+  const selectedMenuId = ref<string | number | null>(null)
+
+  /**
+   * 02. computed 선언
+   */
   const iconName = computed(() => isCreating.value ? 'mdi-minus' : 'mdi-plus')
   const buttonLabel= computed(() => isCreating.value ? '취소' : '생성')
 
-
+  /**
+   * 03. CRUD hook 선언
+   */
+  // 메뉴트리 조회
+  const { data:treemodel, fetch:treeSearch } = useSearch<MenuAdminDto[]>('/api/menus');
+  // 개별 메뉴 조회
+  const { data: menuDetail ,fetch: fetchMenuDetail } = useSearch<MenuAdminDto>('/api/menus')
+  /**
+   * 04. 생명주기 훅 선언
+   */
   onMounted(() => {
-    // treeRef.value?.load('all')
-    console.log(selectedRole)
+    loadTree(selectedRole.value)
   })
 
+  watch(selectedRole, role => {
+    loadTree(role)
+  })
 
-  function toggleCreating () {
-    isCreating.value = !isCreating.value
-    if (isCreating.value) {
-      treeRef.value?.addPlaceholder()
-    } else {
-      treeRef.value?.removePlaceholder()
-    }
+  watch(selectedMenuId, menuId => {
+    console.log(menuId)
+    loadMenuDetail(menuId)
+  })
+
+  async function loadTree (role: string) {
+    await treeSearch({ pathVariable: role })
   }
 
-  // 권한 변경 시 트리 컴포넌트에 로드 요청
-  watch(
-    selectedRole,
-    role => {
-      isCreating.value = false
-      selectedMenu.value = null
-      treeRef.value?.load(role)
-    },
-    { immediate: true }
-  )
-
-  // 메뉴 선택 시 상세 처리
-  watch(
-    selectedMenu,
-    menu => {
-      if (menu && menu.id !== null) {
-        console.log('선택된 메뉴:', menu)
-      // TODO: IndexInfo API 호출 등 추가 처리
-      }
-    }
-  )
-  // 메뉴 저장
-  async function saveMenu (payload: Record<string,any>) {
-    // 1) 메뉴가 선택되지 않았다면 중단
-    if (!selectedMenu.value) {
-      console.warn('저장할 메뉴가 선택되지 않았습니다.');
-      return;
-    }
-
-    // 2) roles 배열내에 { value: string } 형태가 있으면 string으로 추출
-    payload.roles = payload.roles.map(role => {
-      if (role && typeof role === 'object' && 'value' in role) {
-        return role.value;
-      }
-      return role;
-    });
-
-    // 3) selectedMenu가 배열이면 첫 번째 요소, 아니면 단일 객체
-    const menuItem = Array.isArray(selectedMenu.value)
-      ? selectedMenu.value[0]
-      : selectedMenu.value;
-
-    const menuId = menuItem.id;
-    const isUpdate = Number.isInteger(menuId);
-
-    // 4) HTTP 메서드와 URL 결정
-    const method = isUpdate ? 'put' : 'post';
-    const url = isUpdate ? `/api/menus/${menuId}` : '/api/menus';
-
-    try {
-      // 5) Axios 호출
-      const response = await axios[method]<ApiResponse<MenuAdminDto>>(url, payload);
-      if(response.data.code === 'SUCCESS'){
-        await treeRef.value?.load(selectedRole.value);
-        selectedMenu.value = response.data.data;
-        alert(response.data.message)
-      }
-    } catch (err) {
-      let errorMessage = ''
-      if(axios.isAxiosError<ApiResponseError>(err) && err.response){
-        errorMessage = err.response.data.message
-      }else if(err instanceof Error){
-        errorMessage = err.message
-      }
-      alert(errorMessage)
-    }
+  async function loadMenuDetail (menuId: number) {
+    await fetchMenuDetail({ pathVariable: menuId })
   }
+
+  function toggleCreating (){}
+
+
 </script>
