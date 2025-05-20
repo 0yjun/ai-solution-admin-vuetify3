@@ -1,5 +1,5 @@
 <template>
-  <DashBoard />
+  mainpage
 </template>
 
 <script lang="ts" setup>

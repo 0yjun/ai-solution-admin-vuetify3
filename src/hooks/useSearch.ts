@@ -1,5 +1,6 @@
 import { ref } from 'vue'
 import axios, { type AxiosRequestConfig } from 'axios'
+import type { ApiResponse } from '@/types'
 
 type Params = Record<string, unknown>
 
@@ -16,7 +17,7 @@ export function useSearch<T> (
   fetchUrl: string,
   defaultParams: Params = {}
 ) {
-  const data = ref<T>()
+  const data = ref<T|null>(null)
   const isLoading = ref(false)
   const isSuccess = ref(false)
   const errorMessage = ref('')
@@ -27,9 +28,7 @@ export function useSearch<T> (
    * @param options.pathVariable - URL 뒤에 붙일 path variable
    * @param options.config - axios 요청 설정
    */
-  async function fetch (
-    { params = {}, pathVariable, config = {} }: FetchOptions = {}
-  ): Promise<boolean> {
+  async function fetch ({ params = {}, pathVariable, config = {} }: FetchOptions = {}) {
     isLoading.value = true
     isSuccess.value = false
     errorMessage.value = ''
@@ -43,13 +42,16 @@ export function useSearch<T> (
     const mergedParams: Params = { ...defaultParams, ...params }
 
     try {
-      const response = await axios.get<T>(url, {
+      const response = await axios.get<ApiResponse<T>>(url, {
         params: mergedParams,
         ...config,
       })
-      data.value = response.data.data as T
-      isSuccess.value = true
-      return true
+
+      if (response.data.code === 'SUCCESS' && response.data.data) {
+        data.value = response.data.data
+        isSuccess.value = true
+        return true
+      }
     } catch (err: unknown) {
       if (axios.isAxiosError(err) && err.response) {
         errorMessage.value = err.response.data?.message || err.message

@@ -1,5 +1,6 @@
 <template>
   <v-data-table-server
+    class="overflow-y-scroll"
     density="comfortable"
     :headers="headers"
     :items="pagination.content"

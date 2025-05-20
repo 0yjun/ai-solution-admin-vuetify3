@@ -56,7 +56,6 @@
           :item-label="f.itemLabel"
           :item-value="f.itemValue"
         />
-        {{ }}
 
       </v-card-subtitle>
 
@@ -93,7 +92,7 @@
 
   const emit = defineEmits<{
     (e: 'update', model: MenuAdminDto ): void
-    (e: 'delete', id: number | string|null): void
+    (e: 'delete', id: number): void
   }>()
 
 

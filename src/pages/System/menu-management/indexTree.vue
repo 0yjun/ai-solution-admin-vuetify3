@@ -14,7 +14,6 @@
       <v-icon :icon="item.icon" />
     </template>
   </v-treeview>
-  {{ selectedItem }}
 </template>
 
 <script setup lang="ts">

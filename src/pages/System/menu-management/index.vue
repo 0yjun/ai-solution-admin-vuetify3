@@ -57,6 +57,7 @@
         <IndexInfo
           v-if="menuDetail"
           :model="menuDetail"
+          @delete="onDelete"
           @update="onUpdate"
         />
       </v-col>
@@ -71,6 +72,7 @@
   import type { MenuAdminDto } from '@/types'
   import { useUpdate } from '@/hooks/useUpdate'
   import { useCreate } from '@/hooks/useCreate'
+  import { useDelete } from '@/hooks/useDelete'
   /**
    * 01. ref 선언
    */
@@ -94,9 +96,11 @@
   // 개별 메뉴 조회
   const { data: menuDetail ,fetch: fetchMenuDetail } = useSearch<MenuAdminDto>('/api/menus')
 
-  const { mutate: updateMenu } = useUpdate<MenuAdminDto>('/api/menus')
+  const { mutate: updateMenu, isSuccess:isUpdated, errorMessage:updateError } = useUpdate<MenuAdminDto>('/api/menus')
 
-  const { mutate: createMenu } = useCreate<MenuAdminDto>('/api/menus')
+  const { mutate: createMenu, isSuccess:isCreated, errorMessage:createError } = useCreate<MenuAdminDto>('/api/menus')
+
+  const { mutate: deleteMenu, isSuccess:isDeleted, errorMessage:deleteError } = useDelete('/api/menus')
   /**
    * 04. 생명주기 훅 선언
    */
@@ -153,13 +157,26 @@
   }
 
   async function onUpdate (menu: MenuAdminDto){
-    console.log(menu)
+    menu.roles = menu.roles.map(item=>item?.value)
     if(typeof menu.id == 'number' && menu.id>0){
       await updateMenu(menu.id,menu)
     }else{
       await createMenu(menu)
     }
+    if(!isCreated.value && createError.value.length>0){
+      alert(createError.value)
+    }
+    if(!isUpdated.value && updateError.value.length>0){
+      alert(updateError.value)
+    }
     await loadTree(selectedRole.value)
+  }
 
+  async function onDelete (menuId: number){
+    await deleteMenu(menuId)
+    if(!isDeleted.value){
+      alert(deleteError.value || '메뉴 생성에 실패하였습니다.')
+    }
+    await loadTree(selectedRole.value)
   }
 </script>
