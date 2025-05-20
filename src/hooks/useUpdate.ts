@@ -16,7 +16,7 @@ export function useUpdate<T> (
      * @param payload
      *   - 수정할 필드들을 담은 객체
      */
-  async function mutate (pathVariable: string ,payload: Partial<T>): Promise<T | null> {
+  async function mutate (pathVariable: string | number ,payload: Partial<T>): Promise<T | null> {
     const url = `${baseUrl}/${pathVariable}`
 
     isLoading.value = true

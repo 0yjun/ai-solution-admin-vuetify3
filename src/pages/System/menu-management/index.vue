@@ -56,8 +56,8 @@
       <v-col cols="9">
         <IndexInfo
           v-if="menuDetail"
-          :contents="menuDetail"
-          @save="saveMenu"
+          :model="menuDetail"
+          @update="onUpdate"
         />
       </v-col>
     </v-row>
@@ -69,6 +69,8 @@
   import IndexTree from '@/pages/System/menu-management/indexTree.vue'
   import IndexInfo from '@/pages/System/menu-management/indexInfo.vue'
   import type { MenuAdminDto } from '@/types'
+  import { useUpdate } from '@/hooks/useUpdate'
+  import { useCreate } from '@/hooks/useCreate'
   /**
    * 01. ref 선언
    */
@@ -91,6 +93,10 @@
 
   // 개별 메뉴 조회
   const { data: menuDetail ,fetch: fetchMenuDetail } = useSearch<MenuAdminDto>('/api/menus')
+
+  const { mutate: updateMenu } = useUpdate<MenuAdminDto>('/api/menus')
+
+  const { mutate: createMenu } = useCreate<MenuAdminDto>('/api/menus')
   /**
    * 04. 생명주기 훅 선언
    */
@@ -124,7 +130,7 @@
       treemodel.value = treemodel.value?.filter(item=>item.id!==-1)
       return
     }
-    const placeholder: MenuAdminDto = {
+    const newMenu = {
       id: -1,
       name: '새 메뉴',
       description: '',
@@ -142,7 +148,18 @@
       nextMenuUrl: null,
       nextMenuName: null,
     }
-    treemodel.value?.unshift(placeholder)
-    selectedMenuId.value = placeholder.id
+    treemodel.value?.unshift(newMenu)
+    selectedMenuId.value = newMenu.id
+  }
+
+  async function onUpdate (menu: MenuAdminDto){
+    console.log(menu)
+    if(typeof menu.id == 'number' && menu.id>0){
+      await updateMenu(menu.id,menu)
+    }else{
+      await createMenu(menu)
+    }
+    await loadTree(selectedRole.value)
+
   }
 </script>

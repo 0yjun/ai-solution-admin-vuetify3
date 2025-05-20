@@ -7,7 +7,7 @@
     <v-card-title class="list-title">
       상세정보
       <v-chip
-        v-show="dto.id == null"
+        v-show="props.model.id == null"
         class="ml-1"
 
         color="green"
@@ -18,7 +18,7 @@
       </v-chip>
     </v-card-title>
     <v-divider />
-    <template v-for="(f, idx) in fields" :key="f.key">
+    <template v-for="(f) in defaultFields" :key="f.key">
       <v-card-subtitle
         class="pa-3 search-title"
       >
@@ -26,8 +26,8 @@
         <BaseFormField
           v-if="f.type === 'text' || f.type === 'number'"
           ref="fieldRefs"
-          v-model="fields[idx].text"
-          :content="f"
+          v-model:model-value="model[f.key]"
+          :content="{...f,text:props.model[f.key]}"
           hide-details
         />
 
@@ -35,9 +35,9 @@
         <BaseFormCheckbox
           v-else-if="f.type === 'checkbox'"
           ref="fieldRefs"
-          v-model="fields[idx].text"
+          v-model:model-value="model[f.key]"
           :append-items="f.appendItems"
-          :content="f"
+          :content="{...f,text:model[f.key]}"
           :fetch-url="f.fetchUrl"
           hide-details
           :item-label="f.itemLabel"
@@ -48,14 +48,15 @@
         <BaseFormCombo
           v-else-if="f.type === 'combo'"
           ref="fieldRefs"
-          v-model="fields[idx].text"
+          v-model:model-value="model[f.key]"
           :append-items="f.appendItems"
-          :content="f"
+          :content="{...f,text:model[f.key]}"
           :fetch-url="f.fetchUrl"
           hide-details
           :item-label="f.itemLabel"
           :item-value="f.itemValue"
         />
+        {{ }}
 
       </v-card-subtitle>
 
@@ -66,20 +67,20 @@
     <v-card-subtitle class="d-flex justify-end ga-3 pb-3">
       <v-btn
         color="primary"
-        :text="dto.id ? '수정' : '생성' "
-        @click.stop.prevent="onSave"
+        :text="model.id ? '수정' : '생성' "
+        @click.stop.prevent="emit('update', model)"
       />
       <v-btn
         color="error"
         text="삭제"
-        @click.stop.prevent="()=>{}"
+        @click.stop.prevent="emit('delete', model.id)"
       />
     </v-card-subtitle>
   </v-card>
+
 </template>
 
 <script setup lang="ts">
-  import { computed, reactive, ref, watch } from 'vue'
   import BaseFormField from '@/components/BaseFormField.vue'
   import BaseFormCheckbox from '@/components/BaseFormCheckbox.vue'
   import type { BaseFormFieldProps, MenuAdminDto } from '@/types';
@@ -87,15 +88,14 @@
 
   // 1) props 정의: 배열 또는 단일 객체 모두 받기
   const props = defineProps<{
-    contents: MenuAdminDto | MenuAdminDto[]
+    model: MenuAdminDto
   }>()
 
-  // 2) 실제 사용할 DTO 하나만 꺼내는 computed
-  const dto = computed<MenuAdminDto>(() =>
-    Array.isArray(props.contents)
-      ? props.contents[0]
-      : props.contents
-  )
+  const emit = defineEmits<{
+    (e: 'update', model: MenuAdminDto ): void
+    (e: 'delete', id: number | string|null): void
+  }>()
+
 
   // 3) 폼 필드 메타데이터 (기존 defaultFields)
   const defaultFields: Omit<BaseFormFieldProps, 'text' | 'temp'>[] = [
@@ -273,79 +273,4 @@
       itemValue:'id',
     },
   ]
-
-  // 4) dto 값이 바뀔 때마다 fields 배열 재생성
-  const fields = reactive<BaseFormFieldProps[]>([])
-
-  watch(dto, newDto => {
-    fields.splice(
-      0,
-      fields.length,
-      ...defaultFields.map(f => {
-        // DTO 로부터 원시값만 꺼내고, undefined 일 때만 '' 로 대체
-        const raw = (newDto as any)[f.key]
-        const value = raw === undefined ? '' : raw
-
-        return {
-          ...f,
-          text: value,
-          temp: value,
-        }
-      })
-    )
-  }, { immediate: true })
-
-  // 5) 자식 컴포넌트 참조 수집
-  type FormComponentInstance =
-    | InstanceType<typeof BaseFormField>
-    | InstanceType<typeof BaseFormCheckbox>
-    | InstanceType<typeof BaseFormCombo>
-
-  const fieldRefs = ref<FormComponentInstance[]>([])
-
-  // 6) 부모가 호출할 수 있는 메서드 노출 (검증·값추출 등)
-  const checkAll = async (): Promise<boolean> => {
-    for (const comp of fieldRefs.value) {
-      // 1) comp.validate() 결과를 받고
-      const result = await comp.validate()
-      // 2) boolean인지, 객체인지 판별해서 진짜 유효 플래그를 꺼냅니다.
-      const isValid = typeof result === 'boolean'
-        ? result
-        : (result.valid as boolean)
-
-      if (!isValid) {
-        const content = comp.$props?.content
-        const errorMsg = content?.message || '유효성 검증에 실패했습니다.'
-        console.error(errorMsg)
-        alert(errorMsg)
-        comp.focus()
-        return false
-      }
-    }
-    return true
-  }
-
-  const getValues = (): Record<string, string> => {
-    const result: Record<string, string> = {}
-    for (const f of fields) {
-      result[f.key] = f.text
-    }
-    return result
-  }
-
-  defineExpose({ checkAll, getValues })
-
-  // 7) 부모로 보낼 이벤트 정의
-  const emit = defineEmits<{
-    (e: 'save', payload: Record<string, string>): void
-  }>()
-  async function onSave () {
-    // 반드시 await로 검사
-    if (!(await checkAll())) {
-      console.log('유효성 검사 실패')
-      return
-    }
-    // 유효할 때만 emit
-    emit('save', getValues())
-  }
 </script>

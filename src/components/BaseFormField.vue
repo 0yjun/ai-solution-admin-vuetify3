@@ -51,7 +51,7 @@
   const inputRef = ref<InstanceType<typeof VTextField> | null>(null)
 
   // computed v-model
-  const innerValue = computed<string>({
+  const innerValue = computed<string|number>({
     get:  () => props.modelValue,
     set: v => emit('update:modelValue', v),
   })

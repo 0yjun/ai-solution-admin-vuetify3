@@ -43,11 +43,11 @@ export function useSearch<T> (
     const mergedParams: Params = { ...defaultParams, ...params }
 
     try {
-      const response = await axios.get<T | T[]>(url, {
+      const response = await axios.get<T>(url, {
         params: mergedParams,
         ...config,
       })
-      data.value = response.data.data as T | T[]
+      data.value = response.data.data as T
       isSuccess.value = true
       return true
     } catch (err: unknown) {
