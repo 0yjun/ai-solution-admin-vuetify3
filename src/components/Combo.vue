@@ -1,16 +1,14 @@
 <template>
   <v-select
-    :class="{ 'text-required': required }"
+    v-model="internalValue"
     :density="density"
     :disabled="disabled"
     :hide-details="hideDetail"
-    :item-title="'label'"
-    :item-value="'value'"
+    :item-title="itemLabel"
+    :item-value="itemValue"
     :items="items"
     :label="label"
     outlined
-    :value="modelValue"
-    @update:model-value="(v) => $emit('update:modelValue', v)"
   />
 </template>
 
@@ -36,11 +34,21 @@
     appendItems: { type: Array as PropType<comboItemType[]>, default: () => [] },
 
   })
-
-  const { fetchUrl, fetchParams,appendItems } = toRefs(props)
-  const items:Ref<comboItemType[]>= ref([])
+  onMounted(loadItems)
 
   const emit = defineEmits(['update:modelValue'])
+
+  // 부모 modelValue → 내부 ref 동기화
+  const internalValue = ref(props.modelValue)
+
+  //
+  watch(internalValue, v => emit('update:modelValue', v))
+
+  watch(() => props.modelValue, v => internalValue.value = v)
+
+  const { fetchUrl, fetchParams,appendItems } = toRefs(props)
+
+  const items:Ref<comboItemType[]>= ref([])
 
   async function loadItems () {
     // 1) 부모가 준 appendItems
@@ -65,13 +73,7 @@
 
     // 3) 항상 appendItems를 앞에 붙여서 최종 items 세팅
     items.value = [...prefix, ...remote]
-    emit('update:modelValue',items.value[0]?.value)
   }
-
-  onMounted(loadItems)
-
-  watch(fetchParams, loadItems, { deep: true })
-
 
 </script>
 
