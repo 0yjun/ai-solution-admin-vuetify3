@@ -10,7 +10,7 @@ export function useDelete (baseUrl: string) {
      * @param id        삭제 대상 리소스의 ID
      * @param params    DELETE 시 전달할 추가 쿼리 파라미터들 (cascade, force, soft, etc.)
      */
-  async function mutate (id: string | number, params: Record<string, any> = {}): Promise<boolean> {
+  async function mutate (id: string | number, params: Record<string, unknown> = {}): Promise<boolean> {
     isLoading.value = true
     isSuccess.value = false
     errorMessage.value = ''
@@ -21,8 +21,13 @@ export function useDelete (baseUrl: string) {
     }
 
     try {
-      await axios.delete(url, config)
-      isSuccess.value = true
+      const response = await axios.delete(url, config)
+      if (response.data.code === 'SUCCESS') {
+        isSuccess.value = true
+        alert(response.data.message)
+        return true
+      }
+
     } catch (err: unknown) {
       if (axios.isAxiosError(err) && err.response) {
         errorMessage.value = err.response.data?.message ?? err.message

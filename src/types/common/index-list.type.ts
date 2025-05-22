@@ -5,4 +5,5 @@ export interface IndexListProps<T = any> {
   pagination: PaginatedResult<T>
   options: DataTableOptions
   headers: DataTableHeader[]
+  isLoading?: boolean
 }

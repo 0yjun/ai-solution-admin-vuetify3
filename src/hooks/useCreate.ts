@@ -23,6 +23,7 @@ export function useCreate<T> (createUrl: string) {
       if (resp.code === 'SUCCESS' && resp.data !== undefined) {
         data.value = resp.data
         isSuccess.value = true
+        alert(resp.message)
         return resp.data
       } else {
         errorMessage.value = resp.message || '알 수 없는 서버 오류'

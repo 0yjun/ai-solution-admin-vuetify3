@@ -10,7 +10,7 @@ export interface BaseFormFieldProps {
   disabled: boolean
   maxlength: number | null
   counter: boolean
-  type: 'text'|'number'|'combo'|'checkbox'|'password'
+  type: 'text'|'number'|'combo'|'checkbox'|'password' |'file'
   autofocus: boolean
   color: boolean
   message: string

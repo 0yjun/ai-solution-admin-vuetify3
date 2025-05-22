@@ -61,6 +61,7 @@
   <v-container fluid>
     <IndexList
       :headers="headers"
+      :is-loading="isLoading"
       :options="options"
       :pagination="pagination"
       @delete="onDelete"
@@ -103,10 +104,14 @@
   import PopupCreate from './popupCreate.vue'
   import PopupResetPassword from './popupResetPassword.vue'
 
-  const { pagination, fetchPage, options, onOptionsUpdate } = usePage<MemberAdminDto>('/api/members', 10)
+  const { pagination, fetchPage, isLoading, options, onOptionsUpdate } = usePage<MemberAdminDto>('/api/members', 10)
+
   const { mutate:deleteMember, isSuccess:isDeleting, errorMessage: deleteError } = useDelete('/api/members')
+
   const { mutate:updateMember, isSuccess:isUpdating, errorMessage: updateError } = useUpdate('/api/members')
+
   const { mutate:resetPasswordMember, isSuccess:isPwChanging, errorMessage: pwError } = useUpdate('/api/members')
+
   const { mutate:createMember, isSuccess:isCreating, errorMessage: createError } = useCreate('/api/members')
 
   const editModel = ref<MemberAdminDto>(createEmptyMemberAdminDto())
@@ -203,7 +208,7 @@
     await onSearch();
   }
 
-  async function onDelete (id: number | string) {
+  async function onDelete (id: number ) {
     await deleteMember(id);
     if(!isDeleting){
       console.error(deleteError)

@@ -6,6 +6,7 @@
     :items="pagination.content"
     :items-length="pagination.totalElements"
     :items-per-page="pagination.size"
+    :loading="isLoading"
     multi-sort
     :options="options"
     :server-items-length="pagination.totalElements"
@@ -47,11 +48,11 @@
   import type { DataTableOptions, IndexListProps, MemberAdminDto } from '@/types';
 
 
-  const { pagination, options, headers } = defineProps<IndexListProps>()
+  const { pagination, options, headers, isLoading } = defineProps<IndexListProps>()
   const emit = defineEmits<{
     (e: 'update:options', opts: DataTableOptions): void
     (e: 'popup:update', item: MemberAdminDto): void
     (e: 'popup:reset-password', item: MemberAdminDto): void
-    (e: 'delete', id: number | string): void
+    (e: 'delete', id: number): void
   }>()
 </script>
