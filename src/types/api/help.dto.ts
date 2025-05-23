@@ -10,8 +10,28 @@ export interface HelpImageDto {
   description: string;
   /** 이미지 순서 (1부터 시작) */
   seq: number;
+}
+
+export interface HelpImageFormModel {
+  id?: number;
+  // 생성용에도 blob/file/description/previewUrl 모두 필요
+  blob: string;
+  file: File | null;
+  description: string;
+  previewUrl: string;
+  // 화면 편집용 flag
+  isNew: boolean;
+}
+
+export interface HelpImageCreateRequestDto {
+  /** 이미지 바이너리 데이터 (Base64 문자열) */
+  blob: string;
+  /** 이미지 설명 */
+  description: string;
+  /** 이미지 순서 (1부터 시작) */
   /* File */
-  file: File
+  file: File;
+  previewUrl: string;
 }
 
 /**
@@ -27,7 +47,7 @@ export interface HelpDto {
   menuId: number
 }
 
-export interface HelpCreateDto {
+export interface HelpCreateRequestDto {
   /** 도움말 고유 ID */
   /** 도움말 본문 설명 */
   helpDescription: string;

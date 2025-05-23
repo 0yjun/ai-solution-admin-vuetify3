@@ -26,10 +26,11 @@
 
       <!-- 상세 정보 -->
       <v-col
-        v-if="selectedMenuId.length>0"
+
         cols="9"
       >
         <IndexInfo
+          v-if="selectedMenuId.length>0"
           :help="helpDetail"
           :menu-id="selectedMenuId[0]"
           @create="onCreate"
@@ -37,6 +38,7 @@
           @update="onUpdate"
         />
         {{ helpDetail }}
+        {{ selectedMenuId }}
       </v-col>
     </v-row>
   </v-container>
@@ -45,9 +47,9 @@
 <script setup lang="ts">
   import { useSearch } from '@/hooks/useSearch'
   import IndexTree from '@/pages/System/help-management/indexTree.vue'
-  import IndexInfo from '@/pages/System/help-management/indexInfo.vue'
+  import IndexInfo from '@/pages/System/help-management/index-info/indexInfo.vue'
   import type { MenuAdminDto } from '@/types'
-  import type { HelpCreateDto, HelpDto } from '@/types/api/help.dto'
+  import type { HelpCreateRequestDto, HelpDto } from '@/types/api/help.dto'
   import { useUpdate } from '@/hooks/useUpdate'
   import { useCreate } from '@/hooks/useCreate'
   import { useDelete } from '@/hooks/useDelete'
@@ -92,7 +94,7 @@
     await fetchHelpDetail({ params: { menuId:menuId[0] } })
   }
 
-  async function onCreate (help:HelpCreateDto){
+  async function onCreate (help:HelpCreateRequestDto){
     await createeHelp(help);
     if(!isCreating.value){
       alert(createError.value);

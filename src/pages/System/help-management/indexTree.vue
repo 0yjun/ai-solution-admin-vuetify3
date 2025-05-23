@@ -38,7 +38,6 @@
 
   // selectedItem이 변경되면 부모에 update:modelValue 이벤트 전파
   watch(selectedItem, newId => {
-    console.log(newId)
     emit('update:modelValue',newId)
   })
 </script>

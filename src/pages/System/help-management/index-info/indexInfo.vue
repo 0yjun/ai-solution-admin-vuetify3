@@ -72,7 +72,7 @@
       </v-card-actions>
     </template>
 
-    <Indexcarousel
+    <ImageInfo
       v-if="help"
       :images="help.images"
     />
@@ -83,23 +83,23 @@
 
 <script setup lang="ts">
   import { ref } from 'vue';
-  import { type HelpCreateDto, type HelpDto } from '@/types/api/help.dto';
-  import Indexcarousel from '@/pages/System/help-management/Indexcarousel.vue';
+  import { type HelpCreateRequestDto, type HelpDto } from '@/types/api/help.dto';
   import EmptyStateHolder from '@/components/EmptyStateHolder.vue';
+  import ImageInfo from '@/pages/System/help-management/index-info/imageInfo.vue';
 
-  const props = defineProps<{ help: HelpDto | null , menuId: number }>();
 
   const isCreating = ref(false);
 
-  const help = ref<HelpDto | HelpCreateDto | null>(props.help)
+  const props = defineProps<{ help: HelpDto | null , menuId: number }>();
 
+  const help = ref<HelpDto | HelpCreateRequestDto | null>(props.help)
   watch(()=>props.help, value=>{
     help.value = value
     isCreating.value = false
   })
 
   const emit = defineEmits<{
-    (e: 'create', item: HelpCreateDto): void
+    (e: 'create', item: HelpCreateRequestDto): void
     (e: 'update', item: HelpDto): void
     (e: 'delete', helpId: number): void
   }>()
