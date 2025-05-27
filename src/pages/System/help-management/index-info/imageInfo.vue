@@ -64,7 +64,7 @@
     isCreating.value = false
   })
 
-  const { mutate:deleteHelp, isSuccess: isDeleting, errorMessage: deleteError } = useDelete('/api/helps')
+  const { mutate:deleteHelpImage, isSuccess: isImageDeleting, errorMessage: imaegDeleteError } = useDelete('/api/helps')
 
 
   function createEmptyHelpImage () {
@@ -95,9 +95,9 @@
     if(target.isNew){
       editableHelpImages.value.splice(idx,1)
     }else{
-      await deleteHelp(`${props.helpId}/images/${target.id}`);
-      if(!isDeleting){
-        alert(deleteError)
+      await deleteHelpImage(`${props.helpId}/images/${target.id}`);
+      if(!isImageDeleting){
+        alert(imaegDeleteError)
       }
     }
   }

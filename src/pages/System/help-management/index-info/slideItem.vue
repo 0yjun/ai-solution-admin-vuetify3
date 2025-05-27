@@ -62,7 +62,6 @@
   const emit = defineEmits<{
     (e: 'create', item: HelpImageFormModel): void;
     (e: 'update', item: HelpImageFormModel): void;
-    (e: 'refresh'): void;
     (e: 'delete', helpId: number): void;
   }>();
 

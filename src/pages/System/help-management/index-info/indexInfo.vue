@@ -1,7 +1,7 @@
 <template>
   <v-card class="mb-4" outlined tile>
     <v-card-title class="d-flex align-center list-title" outlined>
-      도움말 상세 정보
+      [{{ menuDetail.name }}]도움말 상세 정보
       <v-spacer />
 
       <!-- 생성/취소 토글 버튼 -->
@@ -65,7 +65,7 @@
       v-if="helpDetail?.images && !isCreating"
       :help-id="props.helpDetail?.helpId"
       :help-images="helpDetail.images"
-      :menu-id="props.menuId"
+      :menu-id="props.menuDetail.id"
     />
   </v-card>
 </template>
@@ -75,11 +75,12 @@
   import type { HelpCreateRequestDto, HelpDto } from '@/types/api/help.dto';
   import EmptyStateHolder from '@/components/EmptyStateHolder.vue';
   import ImageInfo from '@/pages/System/help-management/index-info/imageInfo.vue';
+  import type { MenuAdminDto } from '@/types';
 
   // 1) props 이름을 helpDetail로 통일
   const props = defineProps<{
     helpDetail: HelpDto;
-    menuId: number;
+    menuDetail: MenuAdminDto;
   }>();
 
   const emit = defineEmits<{
@@ -93,12 +94,21 @@
   // 2) 로컬 상태도 helpDetail로
   const helpDetail = ref<HelpDto | HelpCreateRequestDto | null>(props.helpDetail);
 
+  const menuDetail = ref<MenuAdminDto>(props.menuDetail);
+
   // props 변경 감지
   watch(
     () => props.helpDetail,
     value => {
       helpDetail.value = value;
-      isCreating.value = false;
+    }
+  );
+
+  watch(
+    () => props.menuDetail,
+    value => {
+      console.log(value)
+      menuDetail.value = value;
     }
   );
 

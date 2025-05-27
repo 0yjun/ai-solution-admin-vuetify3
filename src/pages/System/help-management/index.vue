@@ -30,8 +30,9 @@
         cols="9"
       >
         <IndexInfo
-          v-if="selectedMenuId.length>0"
+          v-if="selectedMenuId.length>0 && helpDetail && menuDetail"
           :help-detail="helpDetail"
+          :menu-detail="menuDetail"
           :menu-id="selectedMenuId[0]"
           @create="onCreate"
           @delete="onDelete"
@@ -67,6 +68,8 @@
 
   const { data: helpDetail ,fetch: fetchHelpDetail } = useSearch<HelpDto>('/api/helps')
 
+  const { data: menuDetail ,fetch: fetchMenuetail } = useSearch<MenuAdminDto>('/api/menus')
+
   const { mutate:createeHelp, isSuccess: isCreating, errorMessage: createError } = useCreate<HelpDto>('/api/helps')
 
   const { mutate:updateHelp, isSuccess: isUpdating, errorMessage: updateError } = useUpdate<HelpDto>('/api/helps')
@@ -84,7 +87,7 @@
 
   watch(selectedMenuId, menuId => {
     if(menuId.length>0){
-      loadMenuDetail(menuId)
+      refresh()
     }
   })
 
@@ -92,13 +95,19 @@
     await treeSearch({ params: { role: 'all' } })
   }
 
-  async function loadMenuDetail (menuId: number[]) {
+  async function loadHelpDetail (menuId: number[]) {
     await fetchHelpDetail({ params: { menuId:menuId[0] } })
   }
 
+  async function loadMenuDetail (menuId: number[]) {
+    await fetchMenuetail({ pathVariable: menuId[0] })
+  }
+
+
   async function refresh (){
     console.log('refresh')
-    await loadMenuDetail(selectedMenuId.value);
+    await loadHelpDetail(selectedMenuId.value);
+    await loadMenuDetail(selectedMenuId.value)
   }
 
   async function onCreate (help:HelpCreateRequestDto){
@@ -106,7 +115,7 @@
     if(!isCreating.value){
       alert(createError.value);
     }
-    await loadMenuDetail(selectedMenuId.value);
+    await loadHelpDetail(selectedMenuId.value);
     loadTree()
   }
 
@@ -115,7 +124,7 @@
     if(!isUpdating.value){
       alert(updateError.value);
     }
-    await loadMenuDetail(selectedMenuId.value);
+    await loadHelpDetail(selectedMenuId.value);
     loadTree()
   }
 
@@ -124,7 +133,7 @@
     if(!isDeleting.value){
       alert(deleteError.value);
     }
-    await loadMenuDetail(selectedMenuId.value);
+    await loadHelpDetail(selectedMenuId.value);
     loadTree()
   }
 
