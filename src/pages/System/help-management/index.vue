@@ -31,7 +31,7 @@
       >
         <IndexInfo
           v-if="selectedMenuId.length>0"
-          :help="helpDetail"
+          :help-detail="helpDetail"
           :menu-id="selectedMenuId[0]"
           @create="onCreate"
           @delete="onDelete"
@@ -73,6 +73,8 @@
 
   const { mutate:deleteHelp, isSuccess: isDeleting, errorMessage: deleteError } = useDelete('/api/helps')
 
+  provide('refresh', refresh);
+
   /**
    * 04. 생명주기 훅 선언
    */
@@ -92,6 +94,11 @@
 
   async function loadMenuDetail (menuId: number[]) {
     await fetchHelpDetail({ params: { menuId:menuId[0] } })
+  }
+
+  async function refresh (){
+    console.log('refresh')
+    await loadMenuDetail(selectedMenuId.value);
   }
 
   async function onCreate (help:HelpCreateRequestDto){

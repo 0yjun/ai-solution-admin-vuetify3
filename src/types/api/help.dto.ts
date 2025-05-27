@@ -28,10 +28,7 @@ export interface HelpImageCreateRequestDto {
   blob: string;
   /** 이미지 설명 */
   description: string;
-  /** 이미지 순서 (1부터 시작) */
-  /* File */
-  file: File;
-  previewUrl: string;
+  menuId: number;
 }
 
 /**
@@ -44,14 +41,12 @@ export interface HelpDto {
   helpDescription: string;
   /** 연관된 이미지 리스트 (최대 3개) */
   images: HelpImageDto[];
-  menuId: number
 }
 
 export interface HelpCreateRequestDto {
-  /** 도움말 고유 ID */
   /** 도움말 본문 설명 */
   helpDescription: string;
   menuId: number;
-  /** 연관된 이미지 리스트 (최대 3개) */
-  images: HelpImageDto[];
+  /** 연관된 이미지: 빈 배열 */
+  images: [];
 }

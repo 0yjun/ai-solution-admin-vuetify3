@@ -1,14 +1,12 @@
 <template>
   <v-card class="mb-4" outlined tile>
-    <v-card-title
-      class="d-flex align-center list-title"
-      outlined
-    >
+    <v-card-title class="d-flex align-center list-title" outlined>
       도움말 상세 정보
       <v-spacer />
+
       <!-- 생성/취소 토글 버튼 -->
       <v-btn
-        v-if="!help && !isCreating"
+        v-if="!helpDetail && !isCreating"
         small
         @click="createEmptyHelp"
       >
@@ -39,19 +37,15 @@
 
     <!-- 빈 상태 안내 -->
     <EmptyStateHolder
-      v-if="!help && !isCreating"
+      v-if="!helpDetail && !isCreating"
       text="아직 등록된 도움말이 없습니다."
     />
 
     <!-- 생성 중/편집 폼 -->
-    <template
-      v-else-if="help"
-    >
-      <v-card-text
-        class="pa-3"
-      >
+    <template v-else-if="helpDetail">
+      <v-card-text class="pa-3">
         <v-textarea
-          v-model="help.helpDescription"
+          v-model="helpDetail.helpDescription"
           auto-grow
           label="도움말 설명"
           outlined
@@ -59,79 +53,88 @@
         />
       </v-card-text>
 
-      <v-card-actions
-        class="d-flex justify-end ga-3 pb-3"
-      >
-        <v-btn
-          class="mt-2"
-          color="primary"
-          @click="onSaveClick"
-        >
+      <v-card-actions class="d-flex justify-end ga-3 pb-3">
+        <v-btn class="mt-2" color="primary" @click="onSaveClick">
           저장
         </v-btn>
       </v-card-actions>
     </template>
 
+    <!-- 이미지 관리: 생성 모드일 때만 보여줌 -->
     <ImageInfo
-      v-if="help"
-      :images="help.images"
+      v-if="helpDetail?.images && !isCreating"
+      :help-id="props.helpDetail?.helpId"
+      :help-images="helpDetail.images"
+      :menu-id="props.menuId"
     />
-
   </v-card>
-
 </template>
 
 <script setup lang="ts">
-  import { ref } from 'vue';
-  import { type HelpCreateRequestDto, type HelpDto } from '@/types/api/help.dto';
+  import { ref, watch } from 'vue';
+  import type { HelpCreateRequestDto, HelpDto } from '@/types/api/help.dto';
   import EmptyStateHolder from '@/components/EmptyStateHolder.vue';
   import ImageInfo from '@/pages/System/help-management/index-info/imageInfo.vue';
 
+  // 1) props 이름을 helpDetail로 통일
+  const props = defineProps<{
+    helpDetail: HelpDto;
+    menuId: number;
+  }>();
+
+  const emit = defineEmits<{
+    (e: 'create', item: HelpCreateRequestDto): void;
+    (e: 'update', item: HelpDto): void;
+    (e: 'delete', helpId: number): void;
+  }>();
 
   const isCreating = ref(false);
 
-  const props = defineProps<{ help: HelpDto | null , menuId: number }>();
+  // 2) 로컬 상태도 helpDetail로
+  const helpDetail = ref<HelpDto | HelpCreateRequestDto | null>(props.helpDetail);
 
-  const help = ref<HelpDto | HelpCreateRequestDto | null>(props.help)
-  watch(()=>props.help, value=>{
-    help.value = value
-    isCreating.value = false
-  })
+  // props 변경 감지
+  watch(
+    () => props.helpDetail,
+    value => {
+      helpDetail.value = value;
+      isCreating.value = false;
+    }
+  );
 
-  const emit = defineEmits<{
-    (e: 'create', item: HelpCreateRequestDto): void
-    (e: 'update', item: HelpDto): void
-    (e: 'delete', helpId: number): void
-  }>()
-
+  // 새 도움말 시작
   function createEmptyHelp () {
     isCreating.value = true;
-    help.value = { menuId: props.menuId, helpDescription: '', images: [] };
+    // HelpCreateRequestDto 타입에 맞춰서 생성
+    helpDetail.value = {
+      helpDescription: '',
+      menuId: props.menuId,
+      images: [],
+    };
   }
 
+  // 생성 취소
   function cancelCreate () {
     isCreating.value = false;
-    help.value = null
+    helpDetail.value = null;
   }
 
+  // 저장 (create vs update 분기)
   function onSaveClick () {
-    if(!help.value){
-      return;
-    }
-    if( isCreating.value){
-      emit('create', help.value)
-    }else {
-      emit('update', { ...help.value, menuId: props.menuId })
+    if (!helpDetail.value) return;
+
+    if (isCreating.value) {
+      // 타입 단언으로 HelpCreateRequestDto로 넘김
+      emit('create', helpDetail.value as HelpCreateRequestDto);
+    } else {
+      // update 시엔 기존 HelpDto 형태
+      emit('update', helpDetail.value as HelpDto);
     }
   }
 
+  // 삭제
   function onDeleteClick () {
-    if(!help.value || isCreating.value){
-      return
-    }
-    emit('delete',help.value?.helpId)
-
+    if (!helpDetail.value || isCreating.value) return;
+    emit('delete', (helpDetail.value as HelpDto).helpId);
   }
-
-
 </script>
