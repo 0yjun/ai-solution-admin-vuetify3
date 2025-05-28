@@ -59,9 +59,11 @@
       </v-card-actions>
     </template>
 
+    <v-devider />
     <!-- 이미지 관리: 생성 모드가 아닐 때만 -->
     <ImageInfo
       v-if="helpDetailLocal?.images && !localCreating"
+
       :help-id="(helpDetailLocal as HelpDto).helpId"
       :help-images="(helpDetailLocal as HelpDto).images"
       :menu-id="props.menuId"

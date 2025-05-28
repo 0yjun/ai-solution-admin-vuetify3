@@ -1,31 +1,20 @@
-<!-- src/pages/System/help-manages/index-info/slideItem.vue -->
 <template>
-  <v-card outlined>
-    <v-card-title>
-      {{ props.index }}
-      <v-chip
-        v-show="helpImage.isNew"
-        class="ml-1"
-
-        color="green"
-        text-color="white"
-        x-small
-      >
-        NEW
-      </v-chip>
-    </v-card-title>
+  <v-card
+    class="d-flex flex-column"
+    outlined
+  >
     <v-card-text>
       <!-- 1행: 이미지 표시 영역 -->
       <v-img
-        contain
-        max-height="100"
-        min-height="100"
-        :src="helpImage.previewUrl"
+        class="pb-2"
+        cover
+        height="180"
+        :src="previewUrl"
       />
 
       <!-- 2행: 도움말 이미지 설명 인풋 -->
       <v-text-field
-        v-model="helpImage.description"
+        v-model="helpImage.imageDescription"
         dense
         label="이미지 설명"
         outlined
@@ -34,12 +23,12 @@
 
       <!-- 3행: 파일 업로드 인풋 -->
       <v-file-input
-        v-model="file"
+        v-model="localFile"
         accept="image/*"
         dense
         label="파일 업로드"
         outlined
-        @update:model-value="onFileChange"
+        @update:model-value="(e)=>onFileChange(Array.isArray(e) ? e[0]: e)"
       />
     </v-card-text>
 
@@ -55,45 +44,66 @@
 <script setup lang="ts">
   import { ref, watch } from 'vue'
   import { useHelpStore } from '@/stores/help'
-  import type { HelpImageFormModel } from '@/types/api/help.dto'
+  import type { HelpImageFormModel, HelpImageUpdateRequestDto } from '@/types/api/help.dto'
 
   // 부모로부터 단일 이미지 모델을 prop으로 전달받음
   const props = defineProps<{
     helpImage: HelpImageFormModel,
     menuId: number,
     helpId: number,
-    index: number
   }>()
 
   // 로컬 복제(ref)하여 양방향 바인딩
   const helpImage = ref<HelpImageFormModel>({ ...props.helpImage })
-  watch(() => props.helpImage, v => helpImage.value = { ...v })
+  watch(() => props.helpImage, v => {
+    helpImage.value = { ...v }
+    previewUrl.value = v.url
+  })
 
   // 파일 업로드용 ref
-  const file = ref<File>()
+  const localFile = ref<File>()
 
+  const previewUrl = ref<string | ArrayBuffer | null | undefined>(props.helpImage.url || '')
   // Pinia 스토어
   const helpStore = useHelpStore()
 
-  function onFileChange (file: File|File[]) {
-    console.log(file)
+  function onFileChange (file: File) {
+    const reader = new FileReader();
+    reader.onload = ({ target })=>{
+      previewUrl.value = target?.result;
+    }
+    reader.readAsDataURL(file)
+    //localFile.value = file
   }
 
   // 저장 버튼 클릭
   async function onSaveClick () {
+    if(!localFile.value){
+      alert('파일이 선택되지 않았습니다.')
+      return;
+    }
     if (helpImage.value.isNew) {
       // 새 이미지 생성 + 자동 갱신
-      await helpStore.createAndRefresh(helpImage.value , props.menuId)
+      //const helpImageCreateRequestDto: HelpImageCreateRequestDto = { ...helpImage.value , file: localFile.value }
+      const form = new FormData();
+      form.append('imageDescription', helpImage.value.imageDescription);
+      form.append('file', localFile.value)
+      await helpStore.createhelpImageAndRefresh(form, props.helpId, props.menuId)
     } else {
+      console.log('update')
       // 기존 이미지 업데이트 + 자동 갱신
-      await helpStore.updateAndRefresh(helpImage.value , props.menuId)
+      // const helpImageUpdateRequestDto: HelpImageUpdateRequestDto = { ...helpImage.value , file: localFile.value }
+      // await helpStore.updateAndRefresh(helpImageUpdateRequestDto , props.menuId)
+      const form = new FormData();
+      form.append('imageDescription', helpImage.value.imageDescription);
+      form.append('file', localFile.value)
+      await helpStore.updatehelpImageAndRefresh(form, props.helpId, helpImage.value.id, props.menuId)
     }
   }
 
   // 초기화 버튼 클릭
   function onResetClick () {
-    helpImage.value = { ...props.helpImage }
-    file.value = undefined
+    previewUrl.value = helpImage.value.url
   }
 
   // 삭제 버튼 클릭 → emit 체인 대신 스토어 직접 호출

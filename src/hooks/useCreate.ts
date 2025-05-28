@@ -14,18 +14,18 @@ export function useCreate<T> (createUrl: string) {
      * 성공 시 `data`, `isSuccess`를 업데이트하고,
      * 실패 시 `errorMessage`를 설정합니다.
      */
-  async function mutate ({ payload, pathVariable, config = {} }: createRequest<T> ): Promise<T | null> {
+  async function mutate ({ payload, pathVariable, config={} }: createRequest<T> ): Promise<T | null> {
     isLoading.value = true
     isSuccess.value = false
     errorMessage.value = ''
     data.value = null
 
-    if(pathVariable){
-      createUrl = `${createUrl}/${pathVariable}`
-    }
+    const createFullUrl = pathVariable != null
+      ? `${createUrl}/${pathVariable}`
+      : createUrl
 
     try {
-      const { data: resp } = await axios.post<ApiResponse<T>>(createUrl, payload)
+      const { data: resp } = await axios.post<ApiResponse<T>>(createFullUrl, payload, config)
       if (resp.code === 'SUCCESS' && resp.data !== undefined) {
         data.value = resp.data
         isSuccess.value = true

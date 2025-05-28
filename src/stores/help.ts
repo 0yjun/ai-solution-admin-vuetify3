@@ -41,7 +41,13 @@ export const useHelpStore = defineStore('help', () => {
     mutate: createhelpImageOnly,
     isSuccess: helpImageCreating,
     errorMessage: helpImageCreateError,
-  } = useCreate<HelpImageCreateRequestDto>('/api/helps')
+  } = useCreate<FormData>('/api/helps')
+
+  const {
+    mutate: updateHelpImageOnly,
+    isSuccess: helpImageupdating,
+    errorMessage: helpImageUpdateError,
+  } = useUpdate<FormData>('/api/helps')
 
   // ──────────────────────────────────────────────────────────────
   // 3) 조회 액션 래퍼
@@ -91,11 +97,21 @@ export const useHelpStore = defineStore('help', () => {
     await loadHelp(menuId)
   }
 
-  async function createhelpImageAndRefresh (payload: HelpImageCreateRequestDto, helpId:number, menuId: number) {
-    await createhelpImageOnly({ payload, pathVariable: helpId })
+  async function createhelpImageAndRefresh (payload: FormData, helpId:number, menuId: number) {
+    await createhelpImageOnly({ payload, pathVariable: helpId, config: { 'headers':{ 'Content-Type': 'multipart/form-data' } } })
     if (!helpImageCreating.value) {
       alert(helpImageCreateError.value)
       console.error(helpImageCreateError.value)
+    }
+    await loadHelp(menuId)
+  }
+
+
+  async function updatehelpImageAndRefresh (payload: FormData, helpId:number, helpImageId: number, menuId: number) {
+    await updateHelpImageOnly({ payload, pathVariable: `${helpId}/images/${helpImageId}`, config: { 'headers':{ 'Content-Type': 'multipart/form-data' } } })
+    if (!helpImageupdating.value) {
+      alert(helpImageUpdateError.value)
+      console.error(helpImageUpdateError.value)
     }
     await loadHelp(menuId)
   }
@@ -129,5 +145,6 @@ export const useHelpStore = defineStore('help', () => {
     deleteImageAndRefresh,
 
     createhelpImageAndRefresh,
+    updatehelpImageAndRefresh,
   }
 })

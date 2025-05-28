@@ -1,7 +1,7 @@
 <template>
   <v-card class="mb-4 pa-5" outlined>
     <v-card-title class="d-flex align-center list-title">
-      이미지 관리 ({{ editableHelpImages.length }}/3)
+      도움말 이미지 ({{ editableHelpImages.length }})
       <v-spacer />
       <v-btn
         v-if="!isCreating"
@@ -17,10 +17,13 @@
     <!-- Carousel wrapper -->
     <v-carousel
       v-if="editableHelpImages.length"
-      height="400"
+      v-model="currentHelpImageIndex"
       hide-delimiter-background
+      mandatory="force"
       show-arrows
     >
+
+      currentHelpImageIndex:{{ currentHelpImageIndex }}
       <v-carousel-item
         v-for="(helpImage, iIdx) in editableHelpImages"
         :key="iIdx"
@@ -29,7 +32,6 @@
         <SlideItem
           :help-id="props.helpId"
           :help-image="helpImage"
-          :index="iIdx"
           :menu-id="props.menuId"
         />
       </v-carousel-item>
@@ -37,21 +39,27 @@
 
     <v-divider />
   </v-card>
-  <!-- for debug -->
-  <pre>editableHelpImages: {{ editableHelpImages }}</pre>
 </template>
 
 <script setup lang="ts">
   import { ref, watch } from 'vue'
   import SlideItem from '@/pages/System/help-management/index-info/slideItem.vue'
   import type { HelpImageDto, HelpImageFormModel } from '@/types/api/help.dto'
-  import { blobToUrl } from '@/utils/blobToUrl'
 
   // props로 helpImages와 menuId, helpId를 전달받습니다.
   const props = defineProps<{ helpImages: HelpImageDto[]; helpId: number; menuId: number }>()
 
   const isCreating = ref(false)
   const editableHelpImages = ref<HelpImageFormModel[]>([])
+
+  const currentHelpImageIndex = ref<number>(0)
+  const currentHelpImage = ref<HelpImageFormModel>()
+
+  watch(currentHelpImageIndex,
+        index=>{
+          currentHelpImage.value = editableHelpImages[index]
+        }
+  )
 
   // 부모로부터 받은 helpImages를 로컬 폼 모델로 매핑
   watch(
@@ -60,10 +68,10 @@
       editableHelpImages.value = imgs.map(v => ({
         ...v,
         file: null,
-        previewUrl: blobToUrl(v.blob),
         isNew: false,
       }))
       isCreating.value = false
+      currentHelpImageIndex.value = imgs.length - 1
     },
     { immediate: true }
   )
@@ -72,10 +80,11 @@
     if (editableHelpImages.value.length >= 3 || isCreating.value) return
     isCreating.value = true
     const newFormImage: HelpImageFormModel = {
-      blob: '',
-      description: '',
+      imageDescription: '',
       isNew: true,
     }
     editableHelpImages.value.push(newFormImage)
+
+    currentHelpImageIndex.value = editableHelpImages.value.length -1
   }
 </script>

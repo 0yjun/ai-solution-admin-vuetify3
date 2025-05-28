@@ -1,5 +1,6 @@
 import type { ApiResponse } from '@/types'
 import axios from 'axios'
+import type { createRequest } from './useCreate types'
 
 export function useUpdate<T> (
   baseUrl: string
@@ -16,7 +17,7 @@ export function useUpdate<T> (
      * @param payload
      *   - 수정할 필드들을 담은 객체
      */
-  async function mutate (pathVariable: string | number ,payload: Partial<T>): Promise<T | null> {
+  async function mutate ({ payload, pathVariable, config={} }: createRequest<T>): Promise<T | null> {
     const url = `${baseUrl}/${pathVariable}`
 
     isLoading.value = true
@@ -25,7 +26,7 @@ export function useUpdate<T> (
     data.value = null
 
     try {
-      const { data: resp } = await axios.put<ApiResponse<T>>(url, payload)
+      const { data: resp } = await axios.put<ApiResponse<T>>(url, payload, config)
       if (resp.code === 'SUCCESS' && resp.data !== undefined) {
         data.value = resp.data
         alert(resp.message)
