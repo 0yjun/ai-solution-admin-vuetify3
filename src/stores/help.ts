@@ -1,88 +1,133 @@
+// src/stores/help.ts
 import { useCreate } from '@/hooks/useCreate'
 import { useDelete } from '@/hooks/useDelete'
 import { useSearch } from '@/hooks/useSearch'
 import { useUpdate } from '@/hooks/useUpdate'
-import type { HelpDto } from '@/types/api/help.dto'
+import type { HelpCreateRequestDto, HelpDto, HelpImageCreateRequestDto } from '@/types/api/help.dto'
 import { defineStore } from 'pinia'
 
 export const useHelpStore = defineStore('help', () => {
   // ──────────────────────────────────────────────────────────────
   // 1) 검색(Read) 훅
-  const { data: helpDetail, fetch: fetchHelpDetail } = useSearch<HelpDto>('/api/helps')
+  const { data: help, fetch: fetchHelp } = useSearch<HelpDto>('/api/helps')
 
   // ──────────────────────────────────────────────────────────────
-  // 2) 생성/수정/삭제(CUD) 훅
+  // 2) 원시 CRUD mutation 훅 (순수 API 호출용)
   const {
-    mutate: createHelp,
-    isSuccess: isCreating,
+    mutate: createOnly,
+    isSuccess: creating,
     errorMessage: createError,
-  } = useCreate<HelpDto>('/api/helps')
+  } = useCreate<HelpCreateRequestDto>('/api/helps')
 
   const {
-    mutate: updateHelp,
-    isSuccess: isUpdating,
+    mutate: updateOnly,
+    isSuccess: updating,
     errorMessage: updateError,
   } = useUpdate<HelpDto>('/api/helps')
 
   const {
-    mutate: deleteHelp,
-    isSuccess: isDeleting,
+    mutate: deleteOnly,
+    isSuccess: deleting,
     errorMessage: deleteError,
   } = useDelete('/api/helps')
 
   const {
-    mutate: deleteHelpImage,
-    isSuccess: isImageDeleting,
+    mutate: deleteImageOnly,
+    isSuccess: deletingImage,
     errorMessage: imageDeleteError,
-  } = useDelete('/api/helps/images')
+  } = useDelete('/api/helps')
+
+  const {
+    mutate: createhelpImageOnly,
+    isSuccess: helpImageCreating,
+    errorMessage: helpImageCreateError,
+  } = useCreate<HelpImageCreateRequestDto>('/api/helps')
 
   // ──────────────────────────────────────────────────────────────
-  // 3) 스토어 액션 래퍼
+  // 3) 조회 액션 래퍼
   async function loadHelp (menuId: number) {
-    await fetchHelpDetail({ params: { menuId } })
+    await fetchHelp({ params: { menuId } })
   }
 
-  async function addHelp (payload: HelpDto, menuId:number) {
-    await createHelp(payload)
-    if(!isCreating){
+  // ──────────────────────────────────────────────────────────────
+  // 4) orchestration 액션: 오류 출력 + 갱신 포함
+  async function createAndRefresh (payload: HelpCreateRequestDto, menuId: number) {
+    await createOnly({ payload })
+    if (creating.value) {
+      await loadHelp(menuId)
+    } else {
       alert(createError)
       console.error(createError)
     }
-    await loadHelp(menuId)
   }
 
-  async function editHelp (payload: HelpDto, menuId:number) {
-    await updateHelp(payload.helpId, payload)
-    if(!isUpdating){
+  async function updateAndRefresh (payload: HelpDto, menuId: number) {
+    await updateOnly(payload.helpId, payload)
+    if (updating.value) {
+      await loadHelp(menuId)
+    } else {
       alert(updateError)
       console.error(updateError)
     }
-    await loadHelp(menuId)
   }
 
-  async function removeHelp (id: number, menuId: number) {
-    await deleteHelp(id)
-    if(!isDeleting){
+  async function deleteAndRefresh (helpId: number, menuId: number) {
+    await deleteOnly(helpId)
+    if (deleting.value) {
+      await loadHelp(menuId)
+    } else {
       alert(deleteError)
       console.error(deleteError)
     }
+  }
+
+  async function deleteImageAndRefresh (helpId: number, imageId: number, menuId: number) {
+    // DELETE /api/helps/{helpId}/images/{imageId}
+    await deleteImageOnly(`${helpId}/images/${imageId}`)
+    if (!deletingImage.value) {
+      alert(imageDeleteError.value)
+      console.error(imageDeleteError.value)
+    }
     await loadHelp(menuId)
   }
 
-  async function removeHelpImage (helpId: number, imageId: number) {
-  // REST endpoint: DELETE /api/helps/{helpId}/images/{imageId}
-    await deleteHelpImage(`${helpId}/images/${imageId}`)
-    if(!isImageDeleting){
-      alert(imageDeleteError)
-      console.error(imageDeleteError)
+  async function createhelpImageAndRefresh (payload: HelpImageCreateRequestDto, helpId:number, menuId: number) {
+    await createhelpImageOnly({ payload, pathVariable: helpId })
+    if (!helpImageCreating.value) {
+      alert(helpImageCreateError.value)
+      console.error(helpImageCreateError.value)
     }
-    await loadHelp(helpId)
+    await loadHelp(menuId)
   }
 
   // ──────────────────────────────────────────────────────────────
-  // 4) 스토어 공개 API
+  // 5) 스토어 공개 API
   return {
     // state
+    help,
+    creating,
+    updating,
+    deleting,
+    deletingImage,
+    createError,
+    updateError,
+    deleteError,
+    imageDeleteError,
 
+    // raw mutations (순수 CUD)
+    createOnly,
+    updateOnly,
+    deleteOnly,
+    deleteImageOnly,
+    createhelpImageOnly,
+
+    // orchestration methods
+    loadHelp,
+    createAndRefresh,
+    updateAndRefresh,
+    deleteAndRefresh,
+    deleteImageAndRefresh,
+
+    createhelpImageAndRefresh,
   }
 })

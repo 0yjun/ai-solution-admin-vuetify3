@@ -4,137 +4,52 @@
       <!-- 사이드바: 권한 선택 + 트리 -->
       <v-col cols="3">
         <v-card>
-          <v-card-title
-            class="d-flex align-center list-title"
-            outlined
-          >
+          <v-card-title class="d-flex align-center list-title" outlined>
             <span class="font-weight-black flex-grow-1">메뉴</span>
-
           </v-card-title>
-
           <v-divider />
-
-          <!-- 메뉴 트리 (로딩/에러/Tree 뷰 내부 처리) -->
           <IndexTree
-            v-model="selectedMenuId"
             :menu-tree="treemodel || []"
             style="height: 670px;"
+            @select-node="onTreeNodeChange"
           />
           <v-divider />
         </v-card>
       </v-col>
 
       <!-- 상세 정보 -->
-      <v-col
-
-        cols="9"
-      >
+      <v-col cols="9">
         <IndexInfo
-          v-if="selectedMenuId.length>0 && helpDetail && menuDetail"
-          :help-detail="helpDetail"
-          :menu-detail="menuDetail"
-          :menu-id="selectedMenuId[0]"
-          @create="onCreate"
-          @delete="onDelete"
-          @update="onUpdate"
+          v-if="selectedMenuId"
+          :menu-id="selectedMenuId"
         />
-        {{ helpDetail }}
-        {{ selectedMenuId }}
       </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script setup lang="ts">
-  import { useSearch } from '@/hooks/useSearch'
+  import { onMounted, ref } from 'vue'
   import IndexTree from '@/pages/System/help-management/indexTree.vue'
   import IndexInfo from '@/pages/System/help-management/index-info/indexInfo.vue'
   import type { MenuAdminDto } from '@/types'
-  import type { HelpCreateRequestDto, HelpDto } from '@/types/api/help.dto'
-  import { useUpdate } from '@/hooks/useUpdate'
-  import { useCreate } from '@/hooks/useCreate'
-  import { useDelete } from '@/hooks/useDelete'
-  /**
-   * 01. ref 선언
-   */
+  import { useSearch } from '@/hooks/useSearch'
 
-  const selectedMenuId = ref< number[] >([])
+  // --- 메뉴 트리 & 상세 (기존 그대로) ---
+  const selectedMenuId = ref<number>()
+  const { data: treemodel, fetch: treeSearch } = useSearch<MenuAdminDto[]>('/api/menus')
 
-  /**
-   * 03. CRUD hook 선언
-   */
-  // 메뉴트리 조회
-  const { data:treemodel, fetch:treeSearch } = useSearch<MenuAdminDto[]>('/api/menus');
-
-  const { data: helpDetail ,fetch: fetchHelpDetail } = useSearch<HelpDto>('/api/helps')
-
-  const { data: menuDetail ,fetch: fetchMenuetail } = useSearch<MenuAdminDto>('/api/menus')
-
-  const { mutate:createeHelp, isSuccess: isCreating, errorMessage: createError } = useCreate<HelpDto>('/api/helps')
-
-  const { mutate:updateHelp, isSuccess: isUpdating, errorMessage: updateError } = useUpdate<HelpDto>('/api/helps')
-
-  const { mutate:deleteHelp, isSuccess: isDeleting, errorMessage: deleteError } = useDelete('/api/helps')
-
-  provide('refresh', refresh);
-
-  /**
-   * 04. 생명주기 훅 선언
-   */
+  // 1) 초기 로드
   onMounted(() => {
-    loadTree()
+    treeSearch({ params: { role: 'all' } })
   })
 
-  watch(selectedMenuId, menuId => {
-    if(menuId.length>0){
-      refresh()
+  function onTreeNodeChange (e){
+    if(Array.isArray(e)){
+      selectedMenuId.value = e[0]
+    }else{
+      selectedMenuId.value = e
     }
-  })
 
-  async function loadTree () {
-    await treeSearch({ params: { role: 'all' } })
   }
-
-  async function loadHelpDetail (menuId: number[]) {
-    await fetchHelpDetail({ params: { menuId:menuId[0] } })
-  }
-
-  async function loadMenuDetail (menuId: number[]) {
-    await fetchMenuetail({ pathVariable: menuId[0] })
-  }
-
-
-  async function refresh (){
-    console.log('refresh')
-    await loadHelpDetail(selectedMenuId.value);
-    await loadMenuDetail(selectedMenuId.value)
-  }
-
-  async function onCreate (help:HelpCreateRequestDto){
-    await createeHelp(help);
-    if(!isCreating.value){
-      alert(createError.value);
-    }
-    await loadHelpDetail(selectedMenuId.value);
-    loadTree()
-  }
-
-  async function onUpdate (help:HelpDto){
-    await updateHelp(help.helpId, help);
-    if(!isUpdating.value){
-      alert(updateError.value);
-    }
-    await loadHelpDetail(selectedMenuId.value);
-    loadTree()
-  }
-
-  async function onDelete (helpId:number){
-    await deleteHelp(helpId);
-    if(!isDeleting.value){
-      alert(deleteError.value);
-    }
-    await loadHelpDetail(selectedMenuId.value);
-    loadTree()
-  }
-
 </script>

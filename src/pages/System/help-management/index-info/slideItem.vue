@@ -1,6 +1,19 @@
-<!-- SlideItem.vue -->
+<!-- src/pages/System/help-manages/index-info/slideItem.vue -->
 <template>
   <v-card outlined>
+    <v-card-title>
+      {{ props.index }}
+      <v-chip
+        v-show="helpImage.isNew"
+        class="ml-1"
+
+        color="green"
+        text-color="white"
+        x-small
+      >
+        NEW
+      </v-chip>
+    </v-card-title>
     <v-card-text>
       <!-- 1행: 이미지 표시 영역 -->
       <v-img
@@ -31,58 +44,69 @@
     </v-card-text>
 
     <!-- 액션 영역 -->
-    <v-card-actions
-      class="d-flex justify-end ga-3 pb-3"
-    >
+    <v-card-actions class="d-flex justify-end ga-3 pb-3">
       <v-btn class="mt-2" color="primary" @click="onSaveClick">저장</v-btn>
-      <v-btn class="mt-2" text @click="onResetClick">초기화</v-btn>
-      <v-btn class="mt-2" color="error" text @click="onDeleteClick">삭제</v-btn>
+      <v-btn class="mt-2" @click="onResetClick">초기화</v-btn>
+      <v-btn class="mt-2" color="error" @click="onDeleteClick">삭제</v-btn>
     </v-card-actions>
   </v-card>
 </template>
 
 <script setup lang="ts">
+  import { ref, watch } from 'vue'
+  import { useHelpStore } from '@/stores/help'
   import type { HelpImageFormModel } from '@/types/api/help.dto'
 
-  // 부모로부터 주입받는 단일 이미지 모델
-  const props = defineProps<{ helpImage: HelpImageFormModel , index: number }>()
+  // 부모로부터 단일 이미지 모델을 prop으로 전달받음
+  const props = defineProps<{
+    helpImage: HelpImageFormModel,
+    menuId: number,
+    helpId: number,
+    index: number
+  }>()
 
-  const helpImage = ref<HelpImageFormModel>(props.helpImage)
+  // 로컬 복제(ref)하여 양방향 바인딩
+  const helpImage = ref<HelpImageFormModel>({ ...props.helpImage })
+  watch(() => props.helpImage, v => helpImage.value = { ...v })
 
-  const refresh = inject<() => Promise<void>>('refresh');
-  if (!refresh) throw new Error('refresh 함수가 제공되지 않았습니다.');
+  // 파일 업로드용 ref
+  const file = ref<File>()
 
+  // Pinia 스토어
+  const helpStore = useHelpStore()
 
-  const file = ref(File)
-
-  watch(()=>props.helpImage, value=>{
-    helpImage.value = value
-  })
-
-  const emit = defineEmits<{
-    (e: 'create', item: HelpImageFormModel): void;
-    (e: 'update', item: HelpImageFormModel): void;
-    (e: 'delete', helpId: number): void;
-  }>();
-
-  function onFileChange (e){
-    console.log(e)
+  function onFileChange (file: File|File[]) {
+    console.log(file)
   }
 
-  function onSaveClick (){
-    if(helpImage.value.isNew){
-      emit('create', (helpImage.value));
-    }else{
-      emit('update', helpImage.value);
+  // 저장 버튼 클릭
+  async function onSaveClick () {
+    if (helpImage.value.isNew) {
+      // 새 이미지 생성 + 자동 갱신
+      await helpStore.createAndRefresh(helpImage.value , props.menuId)
+    } else {
+      // 기존 이미지 업데이트 + 자동 갱신
+      await helpStore.updateAndRefresh(helpImage.value , props.menuId)
     }
   }
-  function onResetClick (){
 
+  // 초기화 버튼 클릭
+  function onResetClick () {
+    helpImage.value = { ...props.helpImage }
+    file.value = undefined
   }
 
-  function onDeleteClick () {
-    emit('delete', props.index)
-    refresh();
+  // 삭제 버튼 클릭 → emit 체인 대신 스토어 직접 호출
+  async function onDeleteClick () {
+    if(helpImage.value.isNew){
+      helpStore.loadHelp(props.menuId)
+    }else{
+      await helpStore.deleteImageAndRefresh(
+        props.helpId,
+        helpImage.value.id,
+        props.menuId
+      )
+    }
 
   }
 </script>

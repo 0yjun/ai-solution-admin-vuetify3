@@ -201,7 +201,7 @@
   }
 
   async function onCreate (item: MemberAdminDto) {
-    await createMember(item)
+    await createMember({ payload: item })
     if(!isCreating){
       console.error(createError)
     }

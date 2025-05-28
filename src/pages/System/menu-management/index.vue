@@ -161,7 +161,7 @@
     if(typeof menu.id == 'number' && menu.id>0){
       await updateMenu(menu.id,menu)
     }else{
-      await createMenu(menu)
+      await createMenu({ payload: menu })
     }
     if(!isCreated.value && createError.value.length>0){
       alert(createError.value)

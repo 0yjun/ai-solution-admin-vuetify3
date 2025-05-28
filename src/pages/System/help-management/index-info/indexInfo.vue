@@ -1,12 +1,12 @@
 <template>
   <v-card class="mb-4" outlined tile>
     <v-card-title class="d-flex align-center list-title" outlined>
-      [{{ menuDetail.name }}]도움말 상세 정보
+      [{{ menu && menu.name }}] 도움말 상세 정보
       <v-spacer />
 
-      <!-- 생성/취소 토글 버튼 -->
+      <!-- 생성/취소/삭제 토글 버튼 -->
       <v-btn
-        v-if="!helpDetail && !isCreating"
+        v-if="!helpDetailLocal && !localCreating"
         small
         @click="createEmptyHelp"
       >
@@ -14,14 +14,13 @@
         도움말 추가
       </v-btn>
       <v-btn
-        v-else-if="isCreating"
+        v-else-if="localCreating"
         small
         @click="cancelCreate"
       >
         <v-icon left>mdi-cancel</v-icon>
         생성 취소
       </v-btn>
-      <!-- 삭제 버튼 -->
       <v-btn
         v-else
         color="error"
@@ -37,15 +36,15 @@
 
     <!-- 빈 상태 안내 -->
     <EmptyStateHolder
-      v-if="!helpDetail && !isCreating"
+      v-if="!helpDetailLocal && !localCreating"
       text="아직 등록된 도움말이 없습니다."
     />
 
-    <!-- 생성 중/편집 폼 -->
-    <template v-else-if="helpDetail">
+    <!-- 상세 폼 -->
+    <template v-else-if="helpDetailLocal">
       <v-card-text class="pa-3">
         <v-textarea
-          v-model="helpDetail.helpDescription"
+          v-model="helpDetailLocal.helpDescription"
           auto-grow
           label="도움말 설명"
           outlined
@@ -60,91 +59,104 @@
       </v-card-actions>
     </template>
 
-    <!-- 이미지 관리: 생성 모드일 때만 보여줌 -->
+    <!-- 이미지 관리: 생성 모드가 아닐 때만 -->
     <ImageInfo
-      v-if="helpDetail?.images && !isCreating"
-      :help-id="props.helpDetail?.helpId"
-      :help-images="helpDetail.images"
-      :menu-id="props.menuDetail.id"
+      v-if="helpDetailLocal?.images && !localCreating"
+      :help-id="(helpDetailLocal as HelpDto).helpId"
+      :help-images="(helpDetailLocal as HelpDto).images"
+      :menu-id="props.menuId"
     />
   </v-card>
 </template>
 
 <script setup lang="ts">
-  import { ref, watch } from 'vue';
-  import type { HelpCreateRequestDto, HelpDto } from '@/types/api/help.dto';
-  import EmptyStateHolder from '@/components/EmptyStateHolder.vue';
-  import ImageInfo from '@/pages/System/help-management/index-info/imageInfo.vue';
-  import type { MenuAdminDto } from '@/types';
+  import { ref, watch } from 'vue'
+  import { useHelpStore } from '@/stores/help'
+  import EmptyStateHolder from '@/components/EmptyStateHolder.vue'
+  import ImageInfo from '@/pages/System/help-management/index-info/imageInfo.vue'
+  import type { HelpCreateRequestDto, HelpDto } from '@/types/api/help.dto'
+  import type { MenuAdminDto } from '@/types'
+  import { useSearch } from '@/hooks/useSearch'
 
-  // 1) props 이름을 helpDetail로 통일
+  // props: 상위 index.vue에서 menuDetail, menuId만 넘겨줌
   const props = defineProps<{
-    helpDetail: HelpDto;
-    menuDetail: MenuAdminDto;
-  }>();
+    menuId: number
+  }>()
 
-  const emit = defineEmits<{
-    (e: 'create', item: HelpCreateRequestDto): void;
-    (e: 'update', item: HelpDto): void;
-    (e: 'delete', helpId: number): void;
-  }>();
+  const { data:menu, fetch: fetchMenu } = useSearch<MenuAdminDto>('/api/menus');
 
-  const isCreating = ref(false);
+  // Pinia store
+  const helpStore = useHelpStore()
 
-  // 2) 로컬 상태도 helpDetail로
-  const helpDetail = ref<HelpDto | HelpCreateRequestDto | null>(props.helpDetail);
+  // 로컬 UI 모드: 생성 모드 토글
+  const localCreating = ref(false)
 
-  const menuDetail = ref<MenuAdminDto>(props.menuDetail);
+  // 편집 중인 도움말(생성 혹은 기존 데이터)
+  const helpDetailLocal = ref<HelpDto | HelpCreateRequestDto | null>(null)
 
-  // props 변경 감지
+  // 메뉴 변경 시 기존 상태 초기화 및 fetch
   watch(
-    () => props.helpDetail,
-    value => {
-      helpDetail.value = value;
-    }
-  );
+    () => props.menuId,
+    async menuId => {
+      localCreating.value = false
+      await helpStore.loadHelp(menuId)
+      helpDetailLocal.value = helpStore.help
 
+      await fetchMenu({ pathVariable: menuId })
+    },
+    { immediate: true }
+  )
+
+  // store.help 변경 시 로컬 데이터 동기화
   watch(
-    () => props.menuDetail,
-    value => {
-      console.log(value)
-      menuDetail.value = value;
+    () => helpStore.help,
+    data => {
+      console.log(data)
+      if (!localCreating.value) {
+        helpDetailLocal.value = data
+      }
     }
-  );
+  )
 
-  // 새 도움말 시작
+  // 생성 폼 모드 전환
   function createEmptyHelp () {
-    isCreating.value = true;
-    // HelpCreateRequestDto 타입에 맞춰서 생성
-    helpDetail.value = {
+    localCreating.value = true
+    helpDetailLocal.value = {
       helpDescription: '',
       menuId: props.menuId,
       images: [],
-    };
-  }
-
-  // 생성 취소
-  function cancelCreate () {
-    isCreating.value = false;
-    helpDetail.value = null;
-  }
-
-  // 저장 (create vs update 분기)
-  function onSaveClick () {
-    if (!helpDetail.value) return;
-
-    if (isCreating.value) {
-      // 타입 단언으로 HelpCreateRequestDto로 넘김
-      emit('create', helpDetail.value as HelpCreateRequestDto);
-    } else {
-      // update 시엔 기존 HelpDto 형태
-      emit('update', helpDetail.value as HelpDto);
     }
   }
 
-  // 삭제
-  function onDeleteClick () {
-    if (!helpDetail.value || isCreating.value) return;
-    emit('delete', (helpDetail.value as HelpDto).helpId);
+  // 생성 취소 → 기존 데이터 복원
+  function cancelCreate () {
+    localCreating.value = false
+    helpDetailLocal.value = helpStore.help
+  }
+
+  // 저장: 생성 vs 수정 분기하여 스토어 호출
+  async function onSaveClick () {
+    if (!helpDetailLocal.value) return
+    if (localCreating.value) {
+      await helpStore.createAndRefresh(
+        helpDetailLocal.value as HelpCreateRequestDto,
+        props.menuId
+      )
+      localCreating.value = false
+    } else {
+      await helpStore.updateAndRefresh(
+        helpDetailLocal.value as HelpDto,
+        props.menuId
+      )
+    }
+  }
+
+  // 삭제: 단일 호출로 삭제 및 재조회
+  async function onDeleteClick () {
+    if (!helpDetailLocal.value || localCreating.value) return
+    await helpStore.deleteAndRefresh(
+      (helpDetailLocal.value as HelpDto).helpId,
+      props.menuId
+    )
   }
 </script>

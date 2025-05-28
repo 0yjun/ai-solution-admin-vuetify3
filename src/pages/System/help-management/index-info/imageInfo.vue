@@ -25,12 +25,12 @@
         v-for="(helpImage, iIdx) in editableHelpImages"
         :key="iIdx"
       >
-        <!-- 추출된 SlideItem 컴포넌트를 여기에 사용 -->
-        {{ helpImage }}
+        <!-- SlideItem 컴포넌트에서 직접 스토어 호출 -->
         <SlideItem
+          :help-id="props.helpId"
           :help-image="helpImage"
           :index="iIdx"
-          @delete="onDelete"
+          :menu-id="props.menuId"
         />
       </v-carousel-item>
     </v-carousel>
@@ -42,64 +42,40 @@
 </template>
 
 <script setup lang="ts">
-  import { defineProps } from 'vue';
-  import type { HelpImageDto, HelpImageFormModel } from '@/types/api/help.dto';
-  import SlideItem from '@/pages/System/help-management/index-info/slideItem.vue';
-  import { blobToUrl } from '@/utils/blobToUrl';
-  import { useDelete } from '@/hooks/useDelete';
+  import { ref, watch } from 'vue'
+  import SlideItem from '@/pages/System/help-management/index-info/slideItem.vue'
+  import type { HelpImageDto, HelpImageFormModel } from '@/types/api/help.dto'
+  import { blobToUrl } from '@/utils/blobToUrl'
 
-  const isCreating = ref(false);
+  // props로 helpImages와 menuId, helpId를 전달받습니다.
+  const props = defineProps<{ helpImages: HelpImageDto[]; helpId: number; menuId: number }>()
 
-  const props = defineProps<{ helpImages: HelpImageDto[],helpId: number }>();
+  const isCreating = ref(false)
+  const editableHelpImages = ref<HelpImageFormModel[]>([])
 
-  const editableHelpImages = ref<HelpImageFormModel[]>([]);
-
-  watch(()=>props.helpImages, imgs=>{
-    editableHelpImages.value = imgs.map((v: HelpImageDto)=>({
-      ...v,
-      file: null,
-      previewUrl: blobToUrl(v.blob),
-      isNew: false,
-    }))
-    isCreating.value = false
-  })
-
-  const { mutate:deleteHelpImage, isSuccess: isImageDeleting, errorMessage: imaegDeleteError } = useDelete('/api/helps')
-
+  // 부모로부터 받은 helpImages를 로컬 폼 모델로 매핑
+  watch(
+    () => props.helpImages,
+    imgs => {
+      editableHelpImages.value = imgs.map(v => ({
+        ...v,
+        file: null,
+        previewUrl: blobToUrl(v.blob),
+        isNew: false,
+      }))
+      isCreating.value = false
+    },
+    { immediate: true }
+  )
 
   function createEmptyHelpImage () {
-    if(editableHelpImages.value.length >3){
-      return;
-    }
-    if(isCreating.value){
-      return;
-    }
-    isCreating.value = true;
-    const newFormImage:HelpImageFormModel = {
+    if (editableHelpImages.value.length >= 3 || isCreating.value) return
+    isCreating.value = true
+    const newFormImage: HelpImageFormModel = {
       blob: '',
-      file: null,
       description: '',
-      previewUrl: '',
       isNew: true,
     }
     editableHelpImages.value.push(newFormImage)
   }
-
-  async function onDelete (idx: number){
-    const target = editableHelpImages.value[idx];
-    if(!target){
-      alert('삭제할 대상이 잘못되었습니다.')
-      return;
-    }
-
-    if(target.isNew){
-      editableHelpImages.value.splice(idx,1)
-    }else{
-      await deleteHelpImage(`${props.helpId}/images/${target.id}`);
-      if(!isImageDeleting){
-        alert(imaegDeleteError)
-      }
-    }
-  }
-
 </script>
