@@ -54,7 +54,7 @@ router.beforeEach(async (to,from)=>{
 
   // 2) 로그인 후에도 메뉴가 로드되지 않았다면 재시도
   if (authStore.isAuthenticated && !menuStore.isLoaded && !menuStore.isLoading) {
-    await menuStore.fetchMenu()
+    await menuStore.fetchClientMenu()
   }
 })
 

@@ -44,7 +44,7 @@
 <script setup lang="ts">
   import { ref, watch } from 'vue'
   import { useHelpStore } from '@/stores/help'
-  import type { HelpImageFormModel, HelpImageUpdateRequestDto } from '@/types/api/help.dto'
+  import type { HelpImageFormModel } from '@/types/api/help.dto'
 
   // 부모로부터 단일 이미지 모델을 prop으로 전달받음
   const props = defineProps<{

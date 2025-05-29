@@ -21,7 +21,7 @@
 
   onMounted(() => {
     if (!menuStore.isLoaded) {
-      menuStore.fetchMenu()
+      menustore.fetchClientMenu()
     }
   })
 

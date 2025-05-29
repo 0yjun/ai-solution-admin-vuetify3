@@ -1,7 +1,13 @@
 <template>
   <v-card class="mb-4 pa-5" outlined>
     <v-card-title class="d-flex align-center list-title">
-      도움말 이미지 ({{ editableHelpImages.length }})
+      도움말 이미지
+      <span
+        v-if="editableHelpImages.length>0"
+      >
+        [{{ currentHelpImageIndex+1 }} / {{ editableHelpImages.length }} ]
+      </span>
+
       <v-spacer />
       <v-btn
         v-if="!isCreating"

@@ -51,7 +51,7 @@ export const useMenuStore = defineStore('menu', {
      * 메뉴 API에서 메뉴 리스트를 fetch
      * 이미 로드됐으면 바로 true, 로딩 중이면 false 반환
      */
-    async fetchMenu (): Promise<boolean> {
+    async fetchClientMenu (): Promise<boolean> {
       if (this.isLoaded) return true
       if (this.isLoading) return false
 
