@@ -38,12 +38,12 @@
   import type { BaseFormFieldProps } from '@/types/components/base-form-field.type';
 
 
-  type ComboItem = Record<string, any>
+  type ComboItem = Record<string, unknown>
 
   // props 정의: content와 v-model, 그리고 선택적 fetchUrl, appendItems, itemLabel, itemValue
   const props = defineProps<{
     content: Omit<BaseFormFieldProps, 'temp'>
-    modelValue: any[]
+    modelValue: unknown[]
     fetchUrl?: string|null
     appendItems?: ComboItem[]
     itemLabel?: string
@@ -67,7 +67,7 @@
   const options = ref<ComboItem[]>([])
 
   // internal v-model 바인딩
-  const innerValue = computed<any[]>({
+  const innerValue = computed<unknown[]>({
     get: () => props.modelValue ?? [],
     set: v => emit('update:modelValue', v),
   })

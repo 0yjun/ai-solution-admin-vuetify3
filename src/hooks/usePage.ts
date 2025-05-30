@@ -6,7 +6,7 @@ import type {
   PaginatedResult,
   SortBy,
 } from './usePage.types'
-import type { ApiResponse } from '@/types/common/api.type'
+import type { ApiResponseSuccess } from '@/types/common/api.type'
 
 /** 빈 페이지 생성 유틸 */
 function createEmptyPage<T> (size: number): PaginatedResult<T> {
@@ -57,7 +57,7 @@ export function usePage<T> (fetchUrl: string, defaultSize = 10) {
     }
 
     try {
-      const { data: api } = await axios.get<ApiResponse<PaginatedResult<T>>>(fetchUrl, {
+      const { data: api } = await axios.get<ApiResponseSuccess<PaginatedResult<T>>>(fetchUrl, {
         params,
         paramsSerializer: p => qs.stringify(p, { arrayFormat: 'repeat' }),
       })

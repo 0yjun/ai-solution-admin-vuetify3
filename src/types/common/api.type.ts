@@ -7,7 +7,7 @@ export interface ApiResponseSuccess<T> {
 // 실패 응답: data 필드가 아예 없음
 export interface ApiResponseError {
   // 'SUCCESS'가 아닌 모든 실패 코드
-  code: Exclude<keyof string, 'SUCCESS'>
+  code: Exclude<string, 'SUCCESS'>
   message: string
 }
 

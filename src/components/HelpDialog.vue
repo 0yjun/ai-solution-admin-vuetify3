@@ -62,7 +62,7 @@
 
         <!-- 이미지가 있을 때 캐러셀 -->
         <v-carousel
-          v-else-if="help.images?.length"
+          v-else-if="help?.images?.length"
           cycle
           height="100%"
           hide-delimiter-background

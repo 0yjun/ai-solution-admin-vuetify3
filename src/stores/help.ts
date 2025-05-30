@@ -3,7 +3,7 @@ import { useCreate } from '@/hooks/useCreate'
 import { useDelete } from '@/hooks/useDelete'
 import { useSearch } from '@/hooks/useSearch'
 import { useUpdate } from '@/hooks/useUpdate'
-import type { HelpCreateRequestDto, HelpDto, HelpImageCreateRequestDto } from '@/types/api/help.dto'
+import type { HelpCreateRequestDto, HelpDto } from '@/types/api/help.dto'
 import { defineStore } from 'pinia'
 
 export const useHelpStore = defineStore('help', () => {
@@ -68,7 +68,7 @@ export const useHelpStore = defineStore('help', () => {
   }
 
   async function updateAndRefresh (payload: HelpDto, menuId: number) {
-    await updateOnly(payload.helpId, payload)
+    await updateOnly({ payload, pathVariable: payload.helpId })
     if (updating.value) {
       await loadHelp(menuId)
     } else {

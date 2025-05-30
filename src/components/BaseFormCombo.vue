@@ -38,12 +38,12 @@
   // props 정의
   const props = defineProps<{
     content: Omit<BaseFormFieldProps, 'temp'>
-    modelValue: any
+    modelValue: unknown
   }>()
 
   // v-model emit
   const emit = defineEmits<{
-    (e: 'update:modelValue', value: any): void
+    (e: 'update:modelValue', value: unknown): void
   }>()
 
   // form & select refs
@@ -51,7 +51,7 @@
   const selectRef = ref<InstanceType<typeof VSelect> | null>(null)
 
   // items 저장소
-  const items = ref<Array<Record<string, any>>>([])
+  const items = ref<Array<Record<string, unknown>>>([])
 
   // v-model 내부 바인딩
   const innerValue = computed({
@@ -64,10 +64,10 @@
       ? [...props.content.appendItems]
       : []
 
-    let remote: Array<Record<string, any>> = []
+    let remote: Array<Record<string, unknown>> = []
     if (props.content.fetchUrl) {
       try {
-        const res = await axios.get<{ code: string; data: Record<string, any>[] }>(
+        const res = await axios.get<{ code: string; data: Record<string, unknown>[] }>(
           props.content.fetchUrl
         )
         if (res.data.code === 'SUCCESS' && Array.isArray(res.data.data)) {

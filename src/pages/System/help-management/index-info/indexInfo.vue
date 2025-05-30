@@ -1,5 +1,15 @@
 <template>
-  <v-card class="mb-4" outlined tile>
+  <v-skeleton-loader
+    v-if="helpStore.$state.isFetchLoading || isMenuLoading"
+    :loading="helpStore.$state.isFetchLoading || isMenuLoading"
+    type="card"
+  />
+  <v-card
+    v-else
+    class="mb-4"
+    outlined
+    tile
+  >
     <v-card-title class="d-flex align-center list-title" outlined>
       [{{ menu && menu.name }}] 도움말 상세 정보
       <v-spacer />
@@ -68,6 +78,7 @@
       :menu-id="props.menuId"
     />
   </v-card>
+
 </template>
 
 <script setup lang="ts">
@@ -88,8 +99,6 @@
 
   // Pinia store
   const helpStore = useHelpStore()
-
-  const isLoading = helpStore.$state.isFetchLoading && isMenuLoading;
 
   // 로컬 UI 모드: 생성 모드 토글
   const localCreating = ref(false)

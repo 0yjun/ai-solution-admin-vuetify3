@@ -121,7 +121,7 @@
     }
   )
   // 메뉴 저장
-  async function saveMenu (payload: Record<string,any>) {
+  async function saveMenu (payload: Record<string,unknown>) {
     // 1) 메뉴가 선택되지 않았다면 중단
     if (!selectedMenu.value) {
       console.warn('저장할 메뉴가 선택되지 않았습니다.');

@@ -36,7 +36,7 @@ const router = createRouter({
 
 let initialized = false;
 // 네비게이션 가드 적용
-router.beforeEach(async (to,from)=>{
+router.beforeEach(async to=>{
   const authStore = useAuthStore()
   const menuStore = useMenuStore()
   if(!initialized){

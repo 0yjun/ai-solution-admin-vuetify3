@@ -93,11 +93,10 @@
 
 <script lang="ts" setup>
   import { reactive, ref } from 'vue';
-  import { useAuthStore, useMenuStore } from '@/stores';
+  import { useAuthStore } from '@/stores';
   import { useRouter } from 'vue-router';
 
   const authStore = useAuthStore();
-  const menuStore = useMenuStore();
   const router = useRouter();
   const loginForm = ref();
 

@@ -1,7 +1,4 @@
 import { useMenuStore } from '@/stores'
-import type { MenuClientDto } from '@/types'
-
-
 /**
  * 메뉴 트리를 읽어 autoRoutes(폴더라우터)와 매핑한 뒤,
  * route.meta.helpMenuId 등을 주입하거나 addRoute() 호출

@@ -7,14 +7,14 @@
       <v-col sm="6">
         <v-card-text>
           <v-img
-
             cover
+            height="400px"
             :src="previewUrl"
           >
             <template #error>
               <v-img
                 cover
-                max-width="420px"
+                max-width="300px"
                 src="@/assets/logo.png"
               />
             </template>
@@ -96,20 +96,15 @@
       return;
     }
     if (helpImage.value.isNew) {
-      // 새 이미지 생성 + 자동 갱신
-      //const helpImageCreateRequestDto: HelpImageCreateRequestDto = { ...helpImage.value , file: localFile.value }
       const form = new FormData();
       form.append('imageDescription', helpImage.value.imageDescription);
-      form.append('file', localFile.value)
+      form.append('file', localFile.value as Blob)
       await helpStore.createhelpImageAndRefresh(form, props.helpId, props.menuId)
-    } else {
+    } else if(helpImage.value.id){
       console.log('update')
-      // 기존 이미지 업데이트 + 자동 갱신
-      // const helpImageUpdateRequestDto: HelpImageUpdateRequestDto = { ...helpImage.value , file: localFile.value }
-      // await helpStore.updateAndRefresh(helpImageUpdateRequestDto , props.menuId)
       const form = new FormData();
       form.append('imageDescription', helpImage.value.imageDescription);
-      form.append('file', localFile.value)
+      form.append('file', localFile.value as Blob)
       await helpStore.updatehelpImageAndRefresh(form, props.helpId, helpImage.value.id, props.menuId)
     }
   }
@@ -123,7 +118,7 @@
   async function onDeleteClick () {
     if(helpImage.value.isNew){
       helpStore.loadHelp(props.menuId)
-    }else{
+    }else if(helpImage.value.id){
       await helpStore.deleteImageAndRefresh(
         props.helpId,
         helpImage.value.id,
