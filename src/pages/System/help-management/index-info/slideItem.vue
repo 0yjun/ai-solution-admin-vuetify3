@@ -1,43 +1,46 @@
 <template>
   <v-card
-    class="d-flex flex-column"
+    class="row"
     outlined
   >
-    <v-card-text>
-      <!-- 1행: 이미지 표시 영역 -->
-      <v-img
-        class="pb-2"
-        cover
-        height="180"
-        :src="previewUrl"
-      />
+    <v-row>
+      <v-col sm="6">
+        <v-card-text>
+          <v-img
+            cover
+            :src="previewUrl"
+          />
+        </v-card-text>
 
-      <!-- 2행: 도움말 이미지 설명 인풋 -->
-      <v-text-field
-        v-model="helpImage.imageDescription"
-        dense
-        label="이미지 설명"
-        outlined
-        placeholder="설명을 입력하세요."
-      />
+      </v-col>
 
-      <!-- 3행: 파일 업로드 인풋 -->
-      <v-file-input
-        v-model="localFile"
-        accept="image/*"
-        dense
-        label="파일 업로드"
-        outlined
-        @update:model-value="(e)=>onFileChange(Array.isArray(e) ? e[0]: e)"
-      />
-    </v-card-text>
-
-    <!-- 액션 영역 -->
-    <v-card-actions class="d-flex justify-end ga-3 pb-3">
-      <v-btn class="mt-2" color="primary" @click="onSaveClick">저장</v-btn>
-      <v-btn class="mt-2" @click="onResetClick">초기화</v-btn>
-      <v-btn class="mt-2" color="error" @click="onDeleteClick">삭제</v-btn>
-    </v-card-actions>
+      <v-col>
+        <v-card-text>
+          <v-textarea
+            v-model="helpImage.imageDescription"
+            dense
+            label="이미지 설명"
+            outlined
+            placeholder="설명을 입력하세요."
+          />
+        </v-card-text>
+        <v-card-text>
+          <v-file-input
+            v-model="localFile"
+            accept="image/*"
+            dense
+            label="파일 업로드"
+            outlined
+            @update:model-value="(e)=>onFileChange(Array.isArray(e) ? e[0]: e)"
+          />
+        </v-card-text>
+        <v-card-actions class="d-flex justify-end  pa-3">
+          <v-btn class="mt-2" color="primary" @click="onSaveClick">저장</v-btn>
+          <v-btn class="mt-2" @click="onResetClick">초기화</v-btn>
+          <v-btn class="mt-2" color="error" @click="onDeleteClick">삭제</v-btn>
+        </v-card-actions>
+      </v-col>
+    </v-row>
   </v-card>
 </template>
 
@@ -78,7 +81,7 @@
 
   // 저장 버튼 클릭
   async function onSaveClick () {
-    if(!localFile.value){
+    if(!localFile.value && helpImage.value.isNew){
       alert('파일이 선택되지 않았습니다.')
       return;
     }

@@ -35,7 +35,17 @@
     </template>
 
     <template #append>
-      <v-btn icon="mdi-theme-light-dark" title="toggle theme" @click="toggleTheme" />
+      {{ showHelp }}
+      <v-btn icon @click="showHelp = !showHelp">
+        <v-icon>mdi-help-circle</v-icon>
+      </v-btn>
+
+      <v-btn
+        icon="mdi-theme-light-dark"
+        title="toggle theme"
+        @click="toggleTheme"
+      />
+
       <v-menu min-width="200px">
         <template #activator="{ props }">
           <v-btn
@@ -82,6 +92,9 @@
         </v-card>
       </v-menu>
     </template>
+    <HelpDialog
+      v-model="showHelp"
+    />
   </v-app-bar>
 </template>
 
@@ -91,12 +104,16 @@
   import { storeToRefs } from 'pinia'
   import { useTheme } from 'vuetify'
   import { useRouter } from 'vue-router'
+  import HelpDialog from '@/components/HelpDialog.vue'
 
   const drawerStore = useDrawerStore()
   const { drawerOpen, drawerMini } = storeToRefs(drawerStore)
   const theme = useTheme()
   const authStore = useAuthStore();
   const router = useRouter();
+
+  // 도움말 토글
+  const showHelp = shallowRef(false)
 
   //데스크탑: 미니 토글
   function onDrawerMiniClick () {

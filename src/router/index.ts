@@ -10,6 +10,7 @@ import { setupLayouts } from 'virtual:generated-layouts'
 import { routes as autoRoutes } from 'vue-router/auto-routes'
 import { useAuthStore } from '@/stores/auth'
 import { useMenuStore } from '@/stores'
+import { syncMenuRoutes } from './syncMenuRoutes'
 
 
 // vue-router 플러그인을 사용한 디렉토리 기반 라우팅 설정
@@ -55,6 +56,7 @@ router.beforeEach(async (to,from)=>{
   // 2) 로그인 후에도 메뉴가 로드되지 않았다면 재시도
   if (authStore.isAuthenticated && !menuStore.isLoaded && !menuStore.isLoading) {
     await menuStore.fetchClientMenu()
+    syncMenuRoutes(router)
   }
 })
 

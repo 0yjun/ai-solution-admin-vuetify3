@@ -57,14 +57,18 @@ axios.interceptors.response.use(
 
 // 로드시 menuId 구성
 import { useMenuStore } from './stores';
+import router from './router';
+
 const menuStore = useMenuStore();
 await menuStore.fetchClientMenu();
-
+syncMenuRoutes(router)
 
 // 새로고침시 JWT로 세션 유지
 import { useAuthStore } from './stores';
 import axios from 'axios';
 import { useLoadingStore } from './stores/loading';
+import { syncMenuRoutes } from './router/syncMenuRoutes';
+
 const authStore = useAuthStore()
 if(!authStore.isAuthenticated){
   try {

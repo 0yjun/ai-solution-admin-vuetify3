@@ -182,7 +182,7 @@
     if( typeof item.id?.toString() !== 'string'){
       return
     }
-    await updateMember(item?.id?.toString(), item)
+    await updateMember({ pathVariable:item.id, payload: item })
     if(!isUpdating){
       console.error(updateError)
     }
@@ -193,7 +193,7 @@
     if( typeof item.id?.toString() !== 'string'){
       return
     }
-    await resetPasswordMember(`${item.id}/password/reset`, item)
+    await resetPasswordMember({ pathVariable:`${item.id}/password/reset`,payload:item })
     if(!isPwChanging){
       console.error(pwError)
     }

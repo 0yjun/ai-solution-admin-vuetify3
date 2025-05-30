@@ -28,8 +28,6 @@
       mandatory="force"
       show-arrows
     >
-
-      currentHelpImageIndex:{{ currentHelpImageIndex }}
       <v-carousel-item
         v-for="(helpImage, iIdx) in editableHelpImages"
         :key="iIdx"
