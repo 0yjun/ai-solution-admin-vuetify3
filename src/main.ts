@@ -80,7 +80,7 @@ syncMenuRoutes(router)
 import axios from 'axios';
 import { useLoadingStore } from './stores/loading';
 import { syncMenuRoutes } from './router/syncMenuRoutes';
-import type { ApiResponse, ApiResponseError } from './types';
+import type { ApiResponseError } from './types';
 
 if(!authStore.isAuthenticated){
   try {
