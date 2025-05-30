@@ -8,21 +8,41 @@
             <span class="font-weight-black flex-grow-1">메뉴</span>
           </v-card-title>
           <v-divider />
-          <IndexTree
-            :menu-tree="treemodel || []"
-            style="height: 670px;"
-            @select-node="onTreeNodeChange"
-          />
+          <v-skeleton-loader
+            class="d-flex"
+            :loading="isMenuLoading"
+            type="list-item-two-line"
+          >
+            <IndexTree
+              class="flex-grow-1"
+              :menu-tree="treemodel || []"
+              style="height: 670px;"
+              @select-node="onTreeNodeChange"
+            />
+          </v-skeleton-loader>
+
           <v-divider />
         </v-card>
       </v-col>
 
       <!-- 상세 정보 -->
       <v-col cols="9">
-        <IndexInfo
-          v-if="selectedMenuId"
-          :menu-id="selectedMenuId"
-        />
+        <v-skeleton-loader
+          class="d-flex"
+          :loading="isMenuLoading"
+          type="card"
+        >
+          <div
+            class="flex-grow-1"
+          >
+            <IndexInfo
+              v-if="selectedMenuId"
+              :menu-id="selectedMenuId"
+            />
+          </div>
+
+        </v-skeleton-loader>
+
       </v-col>
     </v-row>
   </v-container>
@@ -37,11 +57,11 @@
 
   // --- 메뉴 트리 & 상세 (기존 그대로) ---
   const selectedMenuId = ref<number>()
-  const { data: treemodel, fetch: treeSearch } = useSearch<MenuAdminDto[]>('/api/menus')
+  const { data: treemodel, fetch, isLoading:isMenuLoading } = useSearch<MenuAdminDto[]>('/api/menus')
 
   // 1) 초기 로드
   onMounted(() => {
-    treeSearch({ params: { role: 'all' } })
+    fetch({ params: { role: 'all' } })
   })
 
   function onTreeNodeChange (e){

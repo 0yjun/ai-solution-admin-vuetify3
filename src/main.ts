@@ -38,6 +38,8 @@ axios.interceptors.request.use(config => {
   return config
 })
 
+import { useAuthStore } from './stores';
+const authStore = useAuthStore()
 axios.interceptors.response.use(
   response => {
     const method = response.config.method?.toLowerCase()
@@ -46,14 +48,25 @@ axios.interceptors.response.use(
     }
     return response
   },
-  error => {
-    const method = error.config?.method?.toLowerCase()
+  error=> {
+    const method = error?.config?.method?.toLowerCase()
     if (method === 'post' || method === 'put' || method === 'delete') {
       loadingStore.setLoading(false)
     }
+
+    const errorResponse:ApiResponseError = error.response.data;
+    console.log(error)
+    if(errorResponse.code==='JWT002' || errorResponse.code ==='JWT001'){
+      alert(errorResponse.message || '토큰이 만료되었습니다.')
+      authStore.$reset()
+      router.push('/Login')
+
+    }
+
     return Promise.reject(error)
   }
 )
+
 
 // 로드시 menuId 구성
 import { useMenuStore } from './stores';
@@ -64,12 +77,11 @@ await menuStore.fetchClientMenu();
 syncMenuRoutes(router)
 
 // 새로고침시 JWT로 세션 유지
-import { useAuthStore } from './stores';
 import axios from 'axios';
 import { useLoadingStore } from './stores/loading';
 import { syncMenuRoutes } from './router/syncMenuRoutes';
+import type { ApiResponse, ApiResponseError } from './types';
 
-const authStore = useAuthStore()
 if(!authStore.isAuthenticated){
   try {
     await authStore.fetchMe()

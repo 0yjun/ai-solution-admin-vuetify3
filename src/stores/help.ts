@@ -9,7 +9,7 @@ import { defineStore } from 'pinia'
 export const useHelpStore = defineStore('help', () => {
   // ──────────────────────────────────────────────────────────────
   // 1) 검색(Read) 훅
-  const { data: help, fetch: fetchHelp } = useSearch<HelpDto>('/api/helps')
+  const { data: help, fetch, isLoading:isFetchLoading } = useSearch<HelpDto>('/api/helps')
 
   // ──────────────────────────────────────────────────────────────
   // 2) 원시 CRUD mutation 훅 (순수 API 호출용)
@@ -52,7 +52,7 @@ export const useHelpStore = defineStore('help', () => {
   // ──────────────────────────────────────────────────────────────
   // 3) 조회 액션 래퍼
   async function loadHelp (menuId: number) {
-    await fetchHelp({ params: { menuId } })
+    await fetch({ params: { menuId } })
   }
 
   // ──────────────────────────────────────────────────────────────
@@ -121,6 +121,7 @@ export const useHelpStore = defineStore('help', () => {
   return {
     // state
     help,
+    isFetchLoading,
     creating,
     updating,
     deleting,

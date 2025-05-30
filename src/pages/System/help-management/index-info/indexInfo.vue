@@ -84,10 +84,12 @@
     menuId: number
   }>()
 
-  const { data:menu, fetch: fetchMenu } = useSearch<MenuAdminDto>('/api/menus');
+  const { data:menu, fetch: fetchMenu, isLoading: isMenuLoading } = useSearch<MenuAdminDto>('/api/menus');
 
   // Pinia store
   const helpStore = useHelpStore()
+
+  const isLoading = helpStore.$state.isFetchLoading && isMenuLoading;
 
   // 로컬 UI 모드: 생성 모드 토글
   const localCreating = ref(false)

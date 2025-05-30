@@ -7,9 +7,18 @@
       <v-col sm="6">
         <v-card-text>
           <v-img
+
             cover
             :src="previewUrl"
-          />
+          >
+            <template #error>
+              <v-img
+                cover
+                max-width="420px"
+                src="@/assets/logo.png"
+              />
+            </template>
+          </v-img>
         </v-card-text>
 
       </v-col>
@@ -66,14 +75,15 @@
   // 파일 업로드용 ref
   const localFile = ref<File>()
 
-  const previewUrl = ref<string | ArrayBuffer | null | undefined>(props.helpImage.url || '')
+  const previewUrl = ref<string | undefined>(props.helpImage.url || '')
   // Pinia 스토어
   const helpStore = useHelpStore()
 
   function onFileChange (file: File) {
     const reader = new FileReader();
     reader.onload = ({ target })=>{
-      previewUrl.value = target?.result;
+      const dataUrl = target?.result as string | undefined;
+      previewUrl.value = dataUrl;
     }
     reader.readAsDataURL(file)
     //localFile.value = file

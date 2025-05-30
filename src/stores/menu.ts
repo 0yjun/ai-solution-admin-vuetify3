@@ -45,7 +45,6 @@ export const useMenuStore = defineStore('menu', {
       return []
     },
   },
-
   actions: {
     /**
      * 메뉴 API에서 메뉴 리스트를 fetch
