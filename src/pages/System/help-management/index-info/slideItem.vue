@@ -9,13 +9,13 @@
           <v-img
             cover
             height="400px"
-            :src="previewUrl"
+            :src="previewUrl || '@/assets/no_image.png'"
           >
             <template #error>
               <v-img
                 cover
                 max-width="300px"
-                src="@/assets/logo.png"
+                src="@/assets/no_image.png"
               />
             </template>
           </v-img>

@@ -93,7 +93,7 @@
 <script setup lang="ts">
   import { reactive, ref } from 'vue'
   import Combo from '@/components/Combo.vue'
-  import type { DataTableHeader, MemberAdminDto } from '@/types'
+  import type { DataTableHeader, MemberAdminDto, SignupRequestDto } from '@/types'
   import { usePage } from '@/hooks/usePage'
   import IndexList from '@/pages/System/member-management/indexList.vue'
   import { useDelete } from '@/hooks/useDelete'
@@ -114,13 +114,13 @@
 
   const { mutate:createMember, isSuccess:isCreating, errorMessage: createError } = useCreate('/api/members')
 
-  const editModel = ref<MemberAdminDto>(createEmptyMemberAdminDto())
+  const editModel = ref<SignupRequestDto>(createEmptyMemberAdminDto())
   const editDialog = ref(false)
 
-  const resetPwModel = ref<MemberAdminDto>(createEmptyMemberAdminDto())
+  const resetPwModel = ref<SignupRequestDto>(createEmptyMemberAdminDto())
   const resetPwDialog = ref(false)
 
-  const createModel = ref<MemberAdminDto>(createEmptyMemberAdminDto())
+  const createModel = ref<SignupRequestDto>(createEmptyMemberAdminDto())
   const createDialog = ref(false)
 
   options.value = {

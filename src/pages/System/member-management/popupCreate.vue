@@ -76,7 +76,7 @@
 </template>
 
 <script setup lang="ts">
-  import type { BaseFormFieldProps, MemberAdminDto } from '@/types';
+  import type { BaseFormFieldProps, MemberAdminDto, SignupRequestDto } from '@/types';
 
   const props = defineProps<{
     dialog: boolean
@@ -88,7 +88,7 @@
     (e: 'update', item: MemberAdminDto): void
   }>()
 
-  function onSaveClick (updated: MemberAdminDto) {
+  function onSaveClick (updated: SignupRequestDto) {
     emit('update', updated)
     emit('update:dialog',false)
   }

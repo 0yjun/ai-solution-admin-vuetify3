@@ -3,7 +3,7 @@ import type { ValidationRule } from 'vuetify'
 export interface BaseFormFieldProps {
   key: string
   text: string
-  temp: string
+  temp?: string
   name: string
   label: string
   placeholder: string

@@ -20,6 +20,10 @@ declare module 'vue-router/auto-routes' {
   export interface RouteNamedMap {
     '/': RouteRecordInfo<'/', '/', Record<never, never>, Record<never, never>>,
     '/[...all]': RouteRecordInfo<'/[...all]', '/:all(.*)', { all: ParamValue<true> }, { all: ParamValue<false> }>,
+    '/chat/realtime/': RouteRecordInfo<'/chat/realtime/', '/chat/realtime', Record<never, never>, Record<never, never>>,
+    '/chat/realtime/chatLogItem': RouteRecordInfo<'/chat/realtime/chatLogItem', '/chat/realtime/chatLogItem', Record<never, never>, Record<never, never>>,
+    '/chat/realtime/IndexInfo': RouteRecordInfo<'/chat/realtime/IndexInfo', '/chat/realtime/IndexInfo', Record<never, never>, Record<never, never>>,
+    '/learning-management/document-ingestion/': RouteRecordInfo<'/learning-management/document-ingestion/', '/learning-management/document-ingestion', Record<never, never>, Record<never, never>>,
     '/Login/': RouteRecordInfo<'/Login/', '/Login', Record<never, never>, Record<never, never>>,
     '/Signup/': RouteRecordInfo<'/Signup/', '/Signup', Record<never, never>, Record<never, never>>,
     '/System/help-management/': RouteRecordInfo<'/System/help-management/', '/System/help-management', Record<never, never>, Record<never, never>>,
@@ -35,8 +39,5 @@ declare module 'vue-router/auto-routes' {
     '/System/menu-management/': RouteRecordInfo<'/System/menu-management/', '/System/menu-management', Record<never, never>, Record<never, never>>,
     '/System/menu-management/indexInfo': RouteRecordInfo<'/System/menu-management/indexInfo', '/System/menu-management/indexInfo', Record<never, never>, Record<never, never>>,
     '/System/menu-management/indexTree': RouteRecordInfo<'/System/menu-management/indexTree', '/System/menu-management/indexTree', Record<never, never>, Record<never, never>>,
-    '/System/menu-management-returnobject/': RouteRecordInfo<'/System/menu-management-returnobject/', '/System/menu-management-returnobject', Record<never, never>, Record<never, never>>,
-    '/System/menu-management-returnobject/indexInfo': RouteRecordInfo<'/System/menu-management-returnobject/indexInfo', '/System/menu-management-returnobject/indexInfo', Record<never, never>, Record<never, never>>,
-    '/System/menu-management-returnobject/indexTree': RouteRecordInfo<'/System/menu-management-returnobject/indexTree', '/System/menu-management-returnobject/indexTree', Record<never, never>, Record<never, never>>,
   }
 }

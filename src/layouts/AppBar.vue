@@ -35,7 +35,6 @@
     </template>
 
     <template #append>
-      {{ showHelp }}
       <v-btn icon @click="showHelp = !showHelp">
         <v-icon>mdi-help-circle</v-icon>
       </v-btn>
